@@ -17,6 +17,11 @@ namespace emiT_C
 
         public int Timelines;
 
+        /// <summary>
+        /// unstable timelines will collapse.
+        /// </summary>
+        public bool Unstable;
+
         public Timeline(Dictionary<string, eVariable> variables, Dictionary<string, eTime> times, List<Statement> statements, int curTimeIndex)
         {
             this.variables = variables;
@@ -49,12 +54,18 @@ namespace emiT_C
 
         public void CreateVariable(string varName)
         {
-            if (variables.ContainsKey(varName) && !variables[varName].Alive)
+            if (variables.ContainsKey(varName))
             {
-                variables[varName].Alive = true;
+                if (!variables[varName].Alive)
+                {
+                    variables[varName].Alive = true;
+                    return;
+                }
+                CreateParadox($"{varName} met itself in the past, two of the same variables cannot exist at the same time.");
             }
             else
             {
+
                 variables.Add(varName, new eVariable());
             }
 
@@ -101,10 +112,21 @@ namespace emiT_C
             }
         }
 
+        public void CreateParadox(string paradox)
+        {
+            Console.WriteLine("Paradox Created: "+paradox);
+            Destabilize();
+        }
+
+        public void Destabilize()
+        {
+            Unstable = true;
+        }
+
         public int Run()
         {
             Timelines++;
-            while(CurTimeIndex < statements.Count)
+            while(CurTimeIndex < statements.Count && !Unstable)
             {
                 eValue val = statements[CurTimeIndex].Evaluate(this);
                 //Console.WriteLine(CurTimeIndex + "::" + statements[CurTimeIndex] + "-> "+ val);

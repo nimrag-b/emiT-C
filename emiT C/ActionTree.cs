@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -154,7 +155,7 @@ namespace emiT_C
             eTime? time = t.GetTime(timeName);
             if(time == null)
             {
-                throw new Exception();
+                throw new Exception($"Point {timeName} does not exist at this point in time.");
             }
 
             Timeline newtimeline = t.Branch(time);

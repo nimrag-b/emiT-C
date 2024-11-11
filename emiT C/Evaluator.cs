@@ -155,7 +155,8 @@ namespace emiT_C
                 {
                     return new eValue(Type.Bool, false);
                 }
-                throw new Exception($"Paradox: {stmt.varName} has never existed in this timeline, and so cannot be dead or alive");
+
+                t.CreateParadox($"{stmt.varName} has never existed in this timeline, and so cannot be dead or alive");
             }
             switch (stmt.property)
             {
