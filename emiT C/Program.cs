@@ -30,13 +30,6 @@ internal class Program
 
         List<Statement> statements = parser.Parse(tokens);
 
-        foreach (var item in statements)
-        {
-            Console.WriteLine(item);
-        }
-
-        Console.WriteLine();
-
         Timeline original = new Timeline(new Dictionary<string, eVariable>(), new Dictionary<string, eTime>(), statements, 0);
 
         Console.WriteLine("Timelines Created: " +original.Run());
