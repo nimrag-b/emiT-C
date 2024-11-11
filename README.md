@@ -10,6 +10,8 @@ This is a small hobby project, most of whaich was written in one afternoon, so i
 
 Feel free to branch or edit any of the source, and if you end up making anything cool with it, id love to see :)
 
+syntax highlighting can be found here: https://github.com/nimrag-b/emiT-syntax
+
 
 # Features
 
