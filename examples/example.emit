@@ -16,7 +16,7 @@ if(x is dead){
 
     traveler warps strike{
         traveler kills y;
-        //traveler kills traveler; //kill self, preventing paradoxes by interfering with itself
+        traveler kills traveler; //kill self, preventing paradoxes by interfering with itself
     };
 
 };

@@ -6,7 +6,10 @@ internal class Program
     private static void Main(string[] args)
     {
 
-        string src;
+        string src = null;
+
+
+#if DEBUG
         if (args.Length == 0)
         {
             string exefolder = System.Reflection.Assembly.GetEntryAssembly().Location;
@@ -16,7 +19,21 @@ internal class Program
         {
             src = File.ReadAllText(args[0]);
         }
+#elif RELEASE
+        if(args.Length != 0)
+        {
+            src = File.ReadAllText(args[0]);
+        }
 
+#endif
+
+        if(src == null)
+        {
+            Console.WriteLine("No Source Code provided");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+            return;
+        }
         Console.WriteLine("Starting Primary Timeline...");
         Lexer lexer = new Lexer();
         List<Token> tokens = lexer.Tokenize(src);
@@ -33,5 +50,7 @@ internal class Program
         Timeline original = new Timeline(new Dictionary<string, eVariable>(), new Dictionary<string, eTime>(), statements, 0);
 
         Console.WriteLine("Timelines Created: " +original.Run());
+        Console.WriteLine("Press any key to continue...");
+        Console.ReadKey();
     }
 }
