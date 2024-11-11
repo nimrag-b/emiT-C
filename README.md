@@ -17,6 +17,11 @@ Time Warping - By warping back to a point definded earlier in the source, a vari
 
 Living variables - Every variable is either alive or dead, and has the ability to kill other variables too. Dead variables can no longer affect the program, and the only way to make them not dead is to send another variable back in time to prevent its murder.
 
+# Planned Features
+
+Waiting for something to happen after warping, so that you can insert other code snippets in places other than directly after travelling
+Proper conflict between two variables being alive at the same time
+
 
 # Keywords
 
