@@ -1,2 +1,36 @@
 # emiT-C
  A time travelling programming language
+
+emiT is a language all about parallel timelines. At any given point you can send a variable back in time, and make it change things about the past, starting a new timeline where the result is different.
+You can kill variables, which destroys them permanantly- at least until you send another variable back in time to kill the variable doing the killing.
+This very quickly leads to a lot of confusion, with a constantly changing source code and the very easy possibility of creating a paradox or a time loop. Remember, the timeline doesnt reset when you go back, any changes made before will remain until you go back even further to stop them from happening.
+
+# About
+This is a small hobby project, most of whaich was written in one afternoon, so if you encounter any bugs or anything, please dont hate me too much.
+
+Feel free to branch or edit any of the source, and if you end up making anything cool with it, id love to see :)
+
+
+# Features
+
+Time Warping - By warping back to a point definded earlier in the source, a variable can go back in time and change the source of the project within a new timeline.
+
+Living variables - Every variable is either alive or dead, and has the ability to kill other variables too. Dead variables can no longer affect the program, and the only way to make them not dead is to send another variable back in time to prevent its murder.
+
+
+# Keywords
+
+create - makes a new variable
+
+kills - kills a variable, taking it permanantly out of action
+
+warps - time travels to a point - creating a new timeline splitting off from the original
+
+time - define a new time point in the current timeline;
+
+dead - if a variable has been killed/ doenst exist yet
+
+alive - if a variable hasnt been killed and currently exists
+
+exists - if a variable has ever existed in this timeline
+
