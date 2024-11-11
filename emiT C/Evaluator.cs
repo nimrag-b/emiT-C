@@ -121,9 +121,9 @@ namespace emiT_C
             {
                 case Operand.Equals:
                     return new eValue(Type.Bool, (int)left.value == (int)right.value);
-                case Operand.Greater:
-                    return new eValue(Type.Bool, (int)left.value > (int)right.value);
                 case Operand.Less:
+                    return new eValue(Type.Bool, (int)left.value > (int)right.value);
+                case Operand.Greater:
                     return new eValue(Type.Bool, (int)left.value < (int)right.value);
                 default:
                     throw new NotImplementedException();
@@ -137,9 +137,9 @@ namespace emiT_C
             {
                 case Operand.Equals:
                     return new eValue(Type.Bool, (float)left.value == (float)right.value);
-                case Operand.Greater:
-                    return new eValue(Type.Bool, (float)left.value > (float)right.value);
                 case Operand.Less:
+                    return new eValue(Type.Bool, (float)left.value > (float)right.value);
+                case Operand.Greater:
                     return new eValue(Type.Bool, (float)left.value < (float)right.value);
                 default:
                     throw new NotImplementedException();
@@ -157,6 +157,7 @@ namespace emiT_C
                 }
 
                 t.CreateParadox($"{stmt.varName} has never existed in this timeline, and so cannot be dead or alive");
+                return new eValue(Type.Bool, false);
             }
             switch (stmt.property)
             {

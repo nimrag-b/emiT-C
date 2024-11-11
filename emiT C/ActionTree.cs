@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -102,7 +103,7 @@ namespace emiT_C
 
         public override eValue Evaluate(Timeline t)
         {
-            eValue r = right.Evaluate(t);
+            eValue r = (eValue)right.Evaluate(t).Clone();
             t.SetVariable(varName.varName, r);
             return r;
         }
@@ -159,10 +160,14 @@ namespace emiT_C
             }
 
             Timeline newtimeline = t.Branch(time);
-            newtimeline.statements.InsertRange(time.SavedTimeIndex, statements); //add the time travellers actions to the new timeline
-            newtimeline.CreateVariable(traveler.varName);
-            newtimeline.SetVariable(traveler.varName,traveler.Evaluate(t));
+
+
+            newtimeline.statements.InsertRange(time.SavedTimeIndex+1, statements); //add the time travellers actions to the new timeline
+            newtimeline.statements.Insert(time.SavedTimeIndex+1, new CreateStmt(traveler.varName, traveler)); //create the traveller in the new timeline
+            //newtimeline.CreateVariable(traveler.varName);
+            //newtimeline.SetVariable(traveler.varName,traveler.Evaluate(t));
             //TODO: add it so that the traveller can wait until something else to do something
+            newtimeline.RecalculateTimeIndexes(time.SavedTimeIndex+1, statements.Count);
 
             t.Timelines += newtimeline.Run(); //start the new timeline
             return null;
@@ -216,7 +221,25 @@ namespace emiT_C
 
         public override string ToString()
         {
-            return $"if ({condition})";
+            StringBuilder cond = new StringBuilder($"if ({condition})");
+            cond.AppendLine();
+            cond.AppendLine("[");
+            foreach (var item in codeblock)
+            {
+                cond.AppendLine(item.ToString());
+            }
+            cond.AppendLine("]");
+
+            return cond.ToString();
+        }
+    }
+
+    public class CollapseStmt : Statement
+    {
+        public override eValue Evaluate(Timeline t)
+        {
+            t.Destabilize();
+            return null;
         }
     }
 

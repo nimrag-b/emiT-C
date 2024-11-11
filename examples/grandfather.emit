@@ -1,22 +1,16 @@
 create x = 10;
 
-x = x - 3;
-
-create y;
-
 time strike;
-
-y kills x;
 
 create traveler;
 
 print(x); //timeline 1 - nothing since x is dead. timeline 2 - prints 7 since traveler stopped x from being killed.
 
-if(x is dead){
+if(x is alive){
 
     traveler warps strike{
-        traveler kills y;
-        //traveler kills traveler; //kill self, preventing paradoxes by interfering with itself
+        x = x + 1;
+        traveler kills traveler; //kill self, preventing paradoxes by interfering with itself
     };
 
 };

@@ -22,7 +22,7 @@ namespace emiT_C
         /// </summary>
         public bool Unstable;
 
-        public Timeline(Dictionary<string, eVariable> variables, Dictionary<string, eTime> times, List<Statement> statements, int curTimeIndex)
+        public Timeline(Dictionary<string, eVariable> variables, Dictionary<string, eTime> times,List<Statement> statements, int curTimeIndex)
         {
             this.variables = variables;
             this.times = times;
@@ -35,11 +35,22 @@ namespace emiT_C
             return new Timeline(time.variables, time.times, time.statements, time.SavedTimeIndex);
         }
 
+        public void RecalculateTimeIndexes(int point, int length)
+        {
+            foreach (var ind in times)
+            {
+                if(ind.Value.SavedTimeIndex > point)
+                {
+                    times[ind.Key].SavedTimeIndex = ind.Value.SavedTimeIndex + length;
+                }
+            }
+        }
+
         public void CreateTimeFrame(string name)
         {
             eTime time = new eTime(
                 variables.ToDictionary(entry => entry.Key, entry => (eVariable)entry.Value.Clone()),
-                times.ToDictionary(entry => entry.Key, entry => entry.Value), //doesnt need to be a deep copy since eTimes are essentially immutable
+                times.ToDictionary(entry => entry.Key, entry => (eTime)entry.Value.Clone()), //doesnt need to be a deep copy since eTimes are essentially immutable
                 new List<Statement>(statements), //can be even shallower copy
                 CurTimeIndex
                 );

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace emiT_C
 {
-    public class eTime
+    public class eTime: ICloneable
     {
         public Dictionary<string, eVariable> variables;
         public Dictionary<string, eTime> times;
@@ -19,6 +19,17 @@ namespace emiT_C
             this.times = times;
             this.statements = statements;
             SavedTimeIndex = savedTimeIndex;
+        }
+
+        public object Clone()
+        {
+            eTime time = new eTime(
+                variables.ToDictionary(entry => entry.Key, entry => (eVariable)entry.Value.Clone()),
+                times.ToDictionary(entry => entry.Key, entry => (eTime)entry.Value.Clone()), //doesnt need to be a deep copy since eTimes are essentially immutable
+                new List<Statement>(statements), //can be even shallower copy
+                SavedTimeIndex
+                );
+            return time;
         }
     }
 }

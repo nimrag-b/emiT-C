@@ -59,6 +59,9 @@ namespace emiT_C
                         case "alive":
                             tokens.Add(new Token(str, TokenType.Alive));
                             continue;
+                        case "exists":
+                            tokens.Add(new Token(str, TokenType.Exists));
+                            continue;
                         case "warps":
                             tokens.Add(new Token(str, TokenType.Warps));
                             continue;
@@ -68,15 +71,15 @@ namespace emiT_C
                         case "time":
                             tokens.Add(new Token(str, TokenType.Time));
                             continue;
+                        case "collapse":
+                            tokens.Add(new Token(str, TokenType.Collapse));
+                            continue;
 
                         case "is":
                             tokens.Add(new Token(str, TokenType.Is));
                             continue;
                         case "if":
                             tokens.Add(new Token(str, TokenType.If));
-                            continue;
-                        case "collapse":
-                            tokens.Add(new Token(str, TokenType.Collapse));
                             continue;
 
                         case "print":

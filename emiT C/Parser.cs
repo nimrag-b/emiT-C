@@ -63,6 +63,9 @@ namespace emiT_C
                     return ParseIf();
                 case TokenType.Print:
                     return ParsePrint();
+                case TokenType.Collapse:
+                    Eat();
+                    return new CollapseStmt();
             }
 
             //for expressions that start with the variable

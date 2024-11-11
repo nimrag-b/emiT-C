@@ -1,0 +1,36 @@
+create x = 1;
+time point;
+
+create flag = 0;
+
+if (x - (x / 15) * 15 == 0){
+    print 71558055;
+    flag = 1;
+};
+
+if (x - (x / 3) * 3 == 0){
+    if(flag == 0){
+    print 7155;
+    flag = 1;
+    };
+
+};
+
+if (x - (x / 5) * 5 == 0){
+    if(flag == 0){
+    print 8055;
+    flag = 1;
+    };
+};
+    if(flag == 0){
+        print x;
+    };
+
+
+if(x < 30){
+    create looper;
+    looper warps point{
+        x = x + 1;
+        looper kills looper;
+    };
+};

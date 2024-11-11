@@ -10,11 +10,11 @@ internal class Program
         if (args.Length == 0)
         {
             string exefolder = System.Reflection.Assembly.GetEntryAssembly().Location;
-            src = File.ReadAllText(Path.GetFullPath(Path.Combine(exefolder, "..", "..", "..", "..","..","examples","example.emit")));
+            src = File.ReadAllText(Path.GetFullPath(Path.Combine(exefolder, "..", "..", "..", "..","..","examples","fizzbuzz.emit")));
         }
         else
         {
-            src = File.ReadAllText(args[0]);  
+            src = File.ReadAllText(args[0]);
         }
 
         Console.WriteLine("Starting Primary Timeline...");
@@ -29,6 +29,13 @@ internal class Program
         Parser parser = new Parser();
 
         List<Statement> statements = parser.Parse(tokens);
+
+        foreach (var item in statements)
+        {
+            Console.WriteLine(item);
+        }
+
+        Console.WriteLine();
 
         Timeline original = new Timeline(new Dictionary<string, eVariable>(), new Dictionary<string, eTime>(), statements, 0);
 
