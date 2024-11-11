@@ -6,9 +6,11 @@ You can kill variables, which destroys them permanantly- at least until you send
 This very quickly leads to a lot of confusion, with a constantly changing source code and the very easy possibility of creating a paradox or a time loop. Remember, the timeline doesnt reset when you go back, any changes made before will remain until you go back even further to stop them from happening.
 
 # About
-This is a small hobby project, most of whaich was written in one afternoon, so if you encounter any bugs or anything, please dont hate me too much.
+This is a small hobby project, most of which was written in one afternoon, so if you encounter any bugs or anything, please dont hate me too much.
 
 Feel free to branch or edit any of the source, and if you end up making anything cool with it, id love to see :)
+
+elsolang wiki link: https://esolangs.org/wiki/EmiT
 
 syntax highlighting can be found here: https://github.com/nimrag-b/emiT-syntax
 
