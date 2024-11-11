@@ -23,6 +23,7 @@ Paradoxes - Its easy to make a paradox, wether its by meeting yourself in the pa
 
 Waiting for something to happen after warping, so that you can insert other code snippets in places other than directly after travelling
 Proper conflict between two variables being alive at the same time
+a Not operator - its more annoying coding without one than i thought.
 
 
 # Keywords
