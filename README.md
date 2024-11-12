@@ -14,6 +14,10 @@ elsolang wiki link: https://esolangs.org/wiki/EmiT
 
 syntax highlighting can be found here: https://github.com/nimrag-b/emiT-syntax
 
+# Writing Programs
+
+First I would recommend checking out the spec folder for the current list of language features (and upcoming ones), as well as this README. Then look through the examples in the examples folder to see code in action. Also make sure to check out the VScode syntax highlighter linked above. To run programs, simple just open them with the exe and watch them run.
+
 
 # Features
 
