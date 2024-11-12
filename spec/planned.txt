@@ -1,0 +1,50 @@
+++
+++PLANNED FEATURES
+++
+
+Key-
+ - - not implemented
+ + - implemented
+ / - partially implemented
+ ? - on hold/non in active development
+
+
+
+ --TYPES
+
+ /Strings
+ /Bools
+ -Structs
+
+
+
+ --OPERATORS
+
+ -Logical operators 
+ -% (modulus)
+
+
+--LANGUAGE FEATURES
+
+-functions - (although warping from a function could cause problems)
+-arrays
+
+-'agents' - non primitive types that can be given values, and have values retrieved
+-Variable-less time travel - insert code into the past without sending a variable to do it
+-Variable-less kill
+-Variable waiting/hiding - sends the variable into the background until a certain condition is true, where it appears again. can be used to avoid variable meeting self
+
+
+ --IMPROVEMENTS
+
+ -Better error handling
+ -Stronger types
+
+
+
+
+--STRETCH GOALS
+
+-But can it run Doom?
+
+?Compiler - definitely out there, unlikely to ever be done

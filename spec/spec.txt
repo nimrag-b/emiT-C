@@ -1,0 +1,89 @@
+++
+++STRUCTURE
+++
+
+emiT is purely functional, and there are (currently) no structs or classes within this project.
+
+The typing system is weak and not error checked, so any incorrect assignments or operations will throw a runtime error. I plan to fix this in the future, but for now its on the programmer to make sure this doesnt happen
+
+++
+++VARIABLES
+++
+
+Every variable must be created with the 'create' keyword, this initialises it with either null (empty variable), or assigned to a value with the assignment operator.
+
+A freshly created variable will have its Alive property set to true, and its existence will be registered on the current timeline, to be collected the next time a time label is encountered.
+
+++
+++TIME
+++
+
+Time in emiT is different for each timeline, and at any point a variable can warp back to a previously defined 'time' label. 
+This label stores the state of the program as it was when it was defined, and uses that infomation to construct a new timeline starting at that point, effectively going back to the previous state of the current timeline, and branching off into a new version. 
+Then, it inserts the code specified in the 'warp' command used to make the timeline, and starts execution of the new timeline from the point of that label. 
+Once the timeline collapses or reaches its end, execution of the timeline it came from resumes.
+
+Currently, two variables cannot exist in the same time, as it causes a paradox. So every time traveler must be killed before it is created, to prevent it from meeting itself and collapsing the timeline.
+
+-LOOPS
+Traditional Programming loops are not possible in emiT, as time within a timeline can only ever move forward. 
+Loops are possible however, but you must instead create a controlled time loop, by continuously sending an agent back in time and iterating to achieve the same effect.
+
+
+
+++
+++KEYWORDS
+++
+
+--LOGICAL
+'if' - evaluates a bool, then runs the following code block if true, and nothing if not.
+
+--ACTIONS
+'create' - creates a new variable. More infomation found in the VARIABLES section.
+'print' - prints the contents to the console
+
+'warp' - time travels a variable back to a previous point. More info in TIME section.
+'time' - defines a point in time to return to, and saves the current state of the program at that point. time travels a variable back to a previous point. More info in TIME section.
+'kills' - when done to another variable by a non-dead variable, sets the victim's Alive property to false
+'collapse' - collapses the current timeline, stopping it from executing and returning control flow to its root timeline.
+
+++
+++TYPES
+++
+
+the primitive types currently implemented are as follows:
+Int - a 32 bit integer
+Float - a 32 bit float
+
+++
+++OPERATORS
+++
+
+--ASSIGNMENT
+= - assignment
+
+--ARITHMETIC
++ - addition
+- - subtraction
+* - multiplication
+/ - division
+
+--UNARY
+prefix
+- - flips sign of following value
++ - doesnt flip sign (not very useful but can be used to assert if operation is arithmetic)
+postfix
+(none currently implemented)
+
+--COMPARISON
+== - equality
+> - less than
+< - greater than
+
+--MATCHING
+'is' - returns the state of a property of a variable
+
+
+
+
+
