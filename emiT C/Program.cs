@@ -1,5 +1,8 @@
 ﻿using emiT_C;
+using emiT_C.Legacy;
 using System.IO;
+using emiT_C;
+using Token = emiT_C.Token;
 
 internal class Program
 {
@@ -35,8 +38,8 @@ internal class Program
             return;
         }
         Console.WriteLine("Starting Primary Timeline...");
-        Lexer lexer = new Lexer();
-        List<Token> tokens = lexer.Tokenize(src);
+        ImprovedLexer lexer = new ImprovedLexer(src);
+        List<Token> tokens = lexer.Tokenize();
 
         //foreach (var item in tokens)
         //{

@@ -4,25 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace emiT_C
+namespace emiT_C.Legacy
 {
     public struct Token
     {
         public string symbol;
         public TokenType type;
-        public object value;
-        public int line;
-        public Token(string symbol, TokenType type, object value, int line)
+        public Token(string symbol, TokenType type)
         {
             this.symbol = symbol;
             this.type = type;
-            this.value = value;
-            this.line = line;
         }
 
         public override string ToString()
         {
-            return symbol + "::" + type;
+            return symbol + " : " + type;
         }
     }
 
@@ -46,25 +42,10 @@ namespace emiT_C
         //Semicolon
         SemiColon,
 
-        //Operators
-
-        //One/Two char tokens
+        //Operators LEGACY
         Assign, // =
-        Not, // !
-
-        Add, // +
-        Subtract, // -
-        Multiply, // *
-        Divide, // /
-        Modulus, // %
-
-        Equals, // ==
-        NotEquals, // !=
-        Greater, // <
-        Less, // >
-        GreaterOrEqual, // <=
-        LessOrEqual, // >=
-
+        BooleanOp, // ==, !=, >, <, <=, >=
+        BinaryOp, // +, -, *, /, %
 
 
         //Keywords

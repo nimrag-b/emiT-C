@@ -81,7 +81,7 @@ namespace emiT_C
                     return ParseWarps(lhs);
             }
 
-            throw new Exception("Unfinished Statement: " + lhs);
+            throw new Exception($"Unfinished Statement {lhs} at line {At().line}");
         }
 
         Statement ParsePrint()
@@ -189,11 +189,11 @@ namespace emiT_C
             switch (At().type)
             {
                 case TokenType.Int:
-                    return new ExprLiteral(int.Parse(At().symbol), GetType(Eat().type));
+                    return new ExprLiteral((int)At().value, GetType(Eat().type));
                 case TokenType.Float:
-                    return new ExprLiteral(float.Parse(At().symbol), GetType(Eat().type));
+                    return new ExprLiteral((float)At().value, GetType(Eat().type));
                 case TokenType.Bool:
-                    return new ExprLiteral(bool.Parse(At().symbol), GetType(Eat().type));
+                    return new ExprLiteral((bool)At().value, GetType(Eat().type));
             }
 
             throw new Exception("Literal type not found");
@@ -205,12 +205,14 @@ namespace emiT_C
         Expression ParseBool()
         {
             Expression lhs = ParseBinaryExpr(0);
-            switch (At().type)
+
+            if(IsBooleanOp(At().type))
             {
-                case TokenType.BooleanOp:
-                    return ParseBooleanExpr(lhs);
-                case TokenType.Is:
-                    return ParseIsStmt((ExprVariable)lhs);
+                return ParseBooleanExpr(lhs);
+            }
+            else if(At().type == TokenType.Is)
+            {
+                return ParseIsStmt((ExprVariable)lhs);
             }
             return lhs;
             //throw new Exception("Invalid Boolean Operation");
@@ -224,7 +226,7 @@ namespace emiT_C
 
         Expression ParseBooleanExpr(Expression lhs)
         {
-            Operand op = GetOperand(Expect(TokenType.BooleanOp).symbol);
+            Operand op = GetOperand(Eat().symbol);
 
             Expression rhs = ParseBinaryExpr(0);
 
@@ -236,7 +238,7 @@ namespace emiT_C
             Token op = At();
             Expression lhs;
 
-            if (op.type == TokenType.BinaryOp)
+            if (IsBinaryOp(op.type))
             {
                 int rbp = PrefixBindingPower(op.symbol);
                 Eat();
@@ -367,6 +369,38 @@ namespace emiT_C
                     return VarProperty.Exists;
                 default:
                     throw new Exception("unrecognised type:" + token);
+            }
+        }
+
+        public bool IsBinaryOp(TokenType token)
+        {
+            switch (token)
+            {
+                case TokenType.Add:
+                case TokenType.Subtract:
+                case TokenType.Multiply:
+                case TokenType.Divide:
+                case TokenType.Modulus:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+        public bool IsBooleanOp(TokenType token)
+        {
+            switch (token)
+            {
+                case TokenType.Equals:
+                case TokenType.Greater:
+                case TokenType.Less:
+                case TokenType.LessOrEqual:
+                case TokenType.GreaterOrEqual:
+                case TokenType.NotEquals:
+                    return true;
+
+                default:
+                    return false;
             }
         }
     }

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using emiT_C.Legacy;
 
-namespace emiT_C
+namespace emiT_C.Legacy
 {
     public class Lexer
     {
@@ -88,7 +89,7 @@ namespace emiT_C
 
                         case "true":
                         case "false":
-                            tokens.Add(new Token(str,TokenType.Bool));
+                            tokens.Add(new Token(str, TokenType.Bool));
                             continue;
 
                         case "int":
@@ -150,27 +151,27 @@ namespace emiT_C
                     case "*":
                     case "/":
                         tokens.Add(new Token(str, TokenType.BinaryOp));
-                        return true; 
+                        return true;
 
                     case "=":
                         tokens.Add(new Token(str, TokenType.Assign));
-                        return true; 
+                        return true;
 
                     case "{":
                         tokens.Add(new Token(str, TokenType.OpenBracket));
-                        return true; 
+                        return true;
                     case "}":
                         tokens.Add(new Token(str, TokenType.CloseBracket));
-                        return true; 
+                        return true;
                     case "(":
                         tokens.Add(new Token(str, TokenType.OpenParen));
-                        return true; 
+                        return true;
                     case ")":
                         tokens.Add(new Token(str, TokenType.CloseParen));
-                        return true; 
+                        return true;
                     case ";":
                         tokens.Add(new Token(str, TokenType.SemiColon));
-                        return true; 
+                        return true;
 
                     default:
                         return false;
