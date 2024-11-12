@@ -4,13 +4,13 @@ time strike;
 
 create traveler;
 
-print(x); //timeline 1 - nothing since x is dead. timeline 2 - prints 7 since traveler stopped x from being killed.
+print(x); //timeline 1 - 10 since x has only existed once. timeline 2 - prints 11. timeline 3 - prints 12 etc.
 
 if(x is alive){
 
     traveler warps strike{
         x = x + 1;
-        traveler kills traveler; //kill self, preventing paradoxes by interfering with itself
+        traveler kills traveler; //kill self, out of respect and dedication for time law.
     };
 
 };
