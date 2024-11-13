@@ -129,6 +129,18 @@ namespace emiT_C
 
             }
         }
+
+        public void SetVariableIndex(string varName, eValue value, int index)
+        {
+            if (variables.ContainsKey(varName))
+            {
+                if (variables[varName].Alive)
+                {
+                    ((eArray)(variables[varName].value.value)).inner[index] = value;
+                }
+
+            }
+        }
         public Statement Peek()
         {
             return context.codeblock[context.CurTimeIndex+1];

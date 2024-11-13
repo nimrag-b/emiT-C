@@ -33,8 +33,14 @@ namespace emiT_C
             {"alive", TokenType.Alive },
             {"exists", TokenType.Exists },
             {"collapse", TokenType.Collapse },
+
             {"true", TokenType.BoolLiteralTrue },
             {"false", TokenType.BoolLiteralFalse },
+
+            {"int", TokenType.IntType },
+            {"float", TokenType.FloatType },
+            {"char", TokenType.CharType },
+            {"bool", TokenType.BoolType },
 
         };
 
@@ -71,6 +77,8 @@ namespace emiT_C
                 case ')': AddToken(TokenType.CloseParen); break;
                 case '{': AddToken(TokenType.OpenBracket); break;
                 case '}': AddToken(TokenType.CloseBracket); break;
+                case '[': AddToken(TokenType.OpenSquare); break;
+                case ']': AddToken(TokenType.CloseSquare); break;
 
                 case '-':
                     AddToken(TokenType.Subtract); break;

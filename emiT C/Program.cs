@@ -15,7 +15,7 @@ internal class Program
         if (args.Length == 0)
         {
             string exefolder = System.Reflection.Assembly.GetEntryAssembly().Location;
-            src = File.ReadAllText(Path.GetFullPath(Path.Combine(exefolder, "..", "..", "..", "..","..","examples", "fizzbuzz.emit")));
+            src = File.ReadAllText(Path.GetFullPath(Path.Combine(exefolder, "..", "..", "..", "..","..","examples", "syntaxtest.emit")));
         }
         else
         {

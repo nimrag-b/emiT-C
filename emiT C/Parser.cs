@@ -131,6 +131,10 @@ namespace emiT_C
         Statement ParseAssignment(ExprVariable lhs)
         {
             Expect(TokenType.Assign);
+            if (IsType(At().type))
+            {
+                return new AssignmentStmt(lhs, ParseArray());
+            }
             return new AssignmentStmt(lhs, ParseBinaryExpr(0));
         }
 
@@ -143,6 +147,10 @@ namespace emiT_C
                 return new CreateStmt(name.symbol, null);
             }
             Expect(TokenType.Assign);
+            if (IsType(At().type))
+            {
+                return new CreateStmt(name.symbol, ParseArray());
+            }
             return new CreateStmt(name.symbol, ParseBinaryExpr(0));
 
         }
@@ -177,7 +185,7 @@ namespace emiT_C
             return new CodeBlockStmt(statements);
         }
 
-        Expression ParseString()
+        ExprLiteral ParseString()
         {
             string str = (string)(Eat().value);
 
@@ -191,6 +199,18 @@ namespace emiT_C
             return new ExprLiteral(eStr, Type.Array);
         }
 
+
+        Expression ParseArray()
+        {
+            Type type = GetType(Eat().type);
+
+            if (At().type == TokenType.OpenSquare)
+            {
+                return new ArrayExpr(ParseIndex(), type);
+            }
+
+            throw new Exception("Unclosed Statement at line " + At().line);
+        }
 
         Expression ParseLiteral()
         {
@@ -206,7 +226,7 @@ namespace emiT_C
                     return new ExprLiteral((float)Eat().value, Type.Float);
                 case TokenType.BoolLiteralFalse:
                     Eat();
-                    return new ExprLiteral(false,Type.Bool);
+                    return new ExprLiteral(false, Type.Bool);
                 case TokenType.BoolLiteralTrue:
                     Eat();
                     return new ExprLiteral(true, Type.Bool);
@@ -217,10 +237,20 @@ namespace emiT_C
 
         ExprVariable ParseVariable()
         {
-
+            
             if(At().type == TokenType.Symbol)
             {
-                return new ExprVariable(Eat().symbol);
+                string symbol = Eat().symbol;
+
+                if (At().type == TokenType.OpenSquare)
+                {
+                    Expression index = ParseIndex();
+
+                    return new IndexExpr(symbol, index);
+                }
+                ExprVariable var = new ExprVariable(symbol);
+
+                return var;
             }
 
             throw new Exception($"Unexpected token {At().type} at line {At().line}");
@@ -258,6 +288,14 @@ namespace emiT_C
             Expression rhs = ParseBinaryExpr(0);
 
             return new BooleanExpr(lhs, rhs, op);
+        }
+
+        public Expression ParseIndex()
+        {
+            Eat();
+            Expression index = ParseBinaryExpr(0);
+            Expect(TokenType.CloseSquare);
+            return index;
         }
 
         public Expression ParseBinaryExpr(int minPrec)
@@ -384,15 +422,34 @@ namespace emiT_C
             switch (token)
             {
                 case TokenType.IntLiteral:
+                case TokenType.IntType:
                     return Type.Int;
                 case TokenType.FloatLiteral:
+                case TokenType.FloatType:
                     return Type.Float;
                 case TokenType.BoolLiteralFalse:
                 case TokenType.BoolLiteralTrue:
+                case TokenType.BoolType:
                     return Type.Bool;
+                case TokenType.CharLiteral:
+                case TokenType.CharType:
+                    return Type.Char;
                 default:
                     throw new Exception("unrecognised type:" + token);
             }
+        }
+
+        public bool IsType(TokenType token)
+        {
+            switch (token)
+            {
+                case TokenType.IntType:
+                case TokenType.FloatType:
+                case TokenType.BoolType:
+                case TokenType.CharType:
+                    return true;
+            }
+            return false;
         }
 
         public VarProperty GetVarProperty(TokenType token)

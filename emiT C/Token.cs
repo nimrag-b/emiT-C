@@ -28,7 +28,10 @@ namespace emiT_C
 
     public enum TokenType
     {
+
         Symbol,
+
+        //literals
         CharLiteral,
         IntLiteral,
         FloatLiteral,
@@ -36,7 +39,11 @@ namespace emiT_C
         BoolLiteralTrue,
         BoolLiteralFalse,
 
-        Type,
+        //Types
+        IntType,
+        FloatType,
+        CharType,
+        BoolType,
 
         //Brackets
 
@@ -44,6 +51,8 @@ namespace emiT_C
         CloseBracket,
         OpenParen,
         CloseParen,
+        OpenSquare,
+        CloseSquare,
 
         //Semicolon
         SemiColon,

@@ -119,7 +119,7 @@ namespace emiT_C
         public override IEnumerable Evaluate(Timeline t)
         {
             eValue r = right.Evaluate(t);
-            t.SetVariable(varName.varName, r);
+            varName.Set(t, r);
             yield return null;
         }
         public override string ToString()
@@ -274,7 +274,7 @@ namespace emiT_C
 
             while (CurTimeIndex < codeblock.Count && !t.Unstable)
             {
-                //Console.WriteLine($"    {CurTimeIndex}::{codeblock[CurTimeIndex]}");
+                //sConsole.WriteLine($"    {CurTimeIndex}::{codeblock[CurTimeIndex]}");
                 IEnumerator block =  codeblock[CurTimeIndex].Evaluate(t).GetEnumerator();
                 while(block.MoveNext())
                 {
@@ -346,6 +346,23 @@ namespace emiT_C
         }
     }
 
+    public class ArrayExpr : Expression
+    {
+        public Expression Length;
+        public Type type;
+
+        public ArrayExpr(Expression length, Type type)
+        {
+            Length = length;
+            this.type = type;
+        }
+
+        public override eValue Evaluate(Timeline t)
+        {
+            return new eValue(Type.Array, new eArray(type, (int)Length.Evaluate(t).value));
+        }
+    }
+
     public class BooleanExpr : ExprBool
     {
         public Expression left;
@@ -388,6 +405,34 @@ namespace emiT_C
             return $"(not {left.ToString()})";
         }
     }
+
+    public class IndexExpr: ExprVariable
+    {
+        public Expression index;
+
+        public IndexExpr(string varName, Expression index) : base(varName)
+        {
+            this.index = index;
+        }
+
+        public override void Set(Timeline t, eValue value)
+        {
+            t.SetVariableIndex(varName, value, (int)index.Evaluate(t).value);
+        }
+
+        public override eValue Evaluate(Timeline t)
+        {
+            eValue arrVal = base.Evaluate(t);
+            int indexVal = (int)index.Evaluate(t).value;
+            if(arrVal.value is eArray)
+            {
+                return ((eArray)arrVal.value).inner[indexVal];
+            }
+            throw new Exception("Tried to index a non-array value");
+        }
+    }
+
+
     public class ExprVariable : Expression
     {
         public string varName;
@@ -395,6 +440,11 @@ namespace emiT_C
         public ExprVariable(string varName)
         {
             this.varName = varName;
+        }
+
+        public virtual void Set(Timeline t, eValue value)
+        {
+            t.SetVariable(varName, value);
         }
 
         public override eValue Evaluate(Timeline t)
@@ -413,6 +463,9 @@ namespace emiT_C
             return $"{varName}";
         }
     }
+
+    
+
     public class ExprLiteral : Expression
     {
         public object value;

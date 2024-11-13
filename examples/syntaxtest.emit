@@ -21,5 +21,13 @@ print x;
 x = "test"; //string
 print x;
 
-print 69;
+x = x[2]; //prints s
+print x;
+
+x = int[2];
+x[1] = 3;
+x = x[1] + 2;
+print x; // prints 5
+
+print "testing complete";
 

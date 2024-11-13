@@ -51,9 +51,14 @@ Loops are possible however, but you must instead create a controlled time loop, 
 ++TYPES
 ++
 
-the primitive types currently implemented are as follows:
-Int - a 32 bit integer
-Float - a 32 bit float
+the types currently implemented are as follows:
+Int - a 32 bit integer - 'int'
+Float - a 32 bit float - 'float'
+Bool - stores true or false - 'bool' -> 'true' or 'false'
+Char - stores a single character - 'char' -> 'x'
+Array - stores an array of types, accessed with an integer within [] -> type[x]
+
+(String - parsed as a char array so not technically real type) -> "x"
 
 ++
 ++OPERATORS
@@ -79,7 +84,9 @@ postfix
 --COMPARISON
 == - equality
 > - less than
+>=
 < - greater than
+<=
 
 --MATCHING
 'is' - returns the state of a property of a variable

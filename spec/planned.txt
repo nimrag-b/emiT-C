@@ -4,7 +4,6 @@
 
 Key-
  - - not implemented
- + - implemented
  / - partially implemented
  ? - on hold/non in active development
 
@@ -12,7 +11,6 @@ Key-
 
  --TYPES
 
- /Strings
  /Bools
  -Structs
 
@@ -21,7 +19,6 @@ Key-
  --OPERATORS
 
  -Logical operators 
- +% (modulus)
  - +=, -=, ++, -- (more arithmetic ops)
  / <=, >=, != (more boolean ops)
 
@@ -29,7 +26,6 @@ Key-
 --LANGUAGE FEATURES
 
 -functions - (although warping from a function could cause problems)
--arrays
 
 -'agents' - non primitive types that can be given values, and have values retrieved
 -Variable-less time travel - insert code into the past without sending a variable to do it
@@ -40,7 +36,7 @@ Key-
  --IMPROVEMENTS
 
  -Better error handling
- -Stronger types
+ /Stronger types
 
 
 
