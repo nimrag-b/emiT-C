@@ -1,0 +1,23 @@
+create x = 0;
+create y = 1;
+create out = x + y;
+
+time jump;
+
+if(out < 0){
+    collapse;
+}
+
+print out;
+
+
+
+create traveler;
+traveler = out;
+traveler warps jump{
+    out = x + y;
+    x = y;
+    y = out;
+    traveler kills traveler;
+}
+
