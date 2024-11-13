@@ -63,7 +63,9 @@ namespace emiT_C
                 return stat;
             }
 
-            throw new Exception($"Unclosed Statement at line {At().line}");
+            Console.WriteLine(At().symbol);
+
+            throw new Exception($"Unclosed Statement at line {At().line}: {stat}");
         }
 
         Statement ParseStatement()
@@ -175,17 +177,39 @@ namespace emiT_C
             return new CodeBlockStmt(statements);
         }
 
+        Expression ParseString()
+        {
+            string str = (string)(Eat().value);
+
+            eArray eStr = new eArray(Type.Char, str.Length);
+
+            for (int i = 0; i < str.Length; i++)
+            {
+                eStr.inner[i] = new eValue(Type.Char, str[i]);
+            }
+
+            return new ExprLiteral(eStr, Type.Array);
+        }
+
 
         Expression ParseLiteral()
         {
             switch (At().type)
             {
-                case TokenType.Int:
-                    return new ExprLiteral((int)At().value, GetType(Eat().type));
-                case TokenType.Float:
-                    return new ExprLiteral((float)At().value, GetType(Eat().type));
-                case TokenType.Bool:
-                    return new ExprLiteral((bool)At().value, GetType(Eat().type));
+                case TokenType.StringLiteral:
+                    return ParseString();
+                case TokenType.CharLiteral:
+                    return new ExprLiteral((char)Eat().value, Type.Char);
+                case TokenType.IntLiteral:
+                    return new ExprLiteral((int)Eat().value, Type.Int);
+                case TokenType.FloatLiteral:
+                    return new ExprLiteral((float)Eat().value, Type.Float);
+                case TokenType.BoolLiteralFalse:
+                    Eat();
+                    return new ExprLiteral(false,Type.Bool);
+                case TokenType.BoolLiteralTrue:
+                    Eat();
+                    return new ExprLiteral(true, Type.Bool);
             }
 
             return ParseVariable();
@@ -359,11 +383,12 @@ namespace emiT_C
         {
             switch (token)
             {
-                case TokenType.Int:
+                case TokenType.IntLiteral:
                     return Type.Int;
-                case TokenType.Float:
+                case TokenType.FloatLiteral:
                     return Type.Float;
-                case TokenType.Bool:
+                case TokenType.BoolLiteralFalse:
+                case TokenType.BoolLiteralTrue:
                     return Type.Bool;
                 default:
                     throw new Exception("unrecognised type:" + token);

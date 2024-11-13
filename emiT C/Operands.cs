@@ -26,9 +26,12 @@ namespace emiT_C
     public enum Type : byte
     {
         Null,
+        Char,
         Int,
         Float,
         String,
-        Bool
+        Bool,
+
+        Array
     }
 }

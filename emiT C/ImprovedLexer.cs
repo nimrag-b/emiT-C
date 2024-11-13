@@ -33,6 +33,8 @@ namespace emiT_C
             {"alive", TokenType.Alive },
             {"exists", TokenType.Exists },
             {"collapse", TokenType.Collapse },
+            {"true", TokenType.BoolLiteralTrue },
+            {"false", TokenType.BoolLiteralFalse },
 
         };
 
@@ -123,6 +125,8 @@ namespace emiT_C
 
                 case '"':
                     GetString(); break;
+                case '\'':
+                    GetChar(); break;
 
 
 
@@ -173,18 +177,18 @@ namespace emiT_C
                     Eat();
                 }
 
-                AddToken(TokenType.Float,float.Parse(src.Substring(start,length)));
+                AddToken(TokenType.FloatLiteral,float.Parse(src.Substring(start,length)));
                 return;
             }
 
             if(Peek() == 'f') //allows defining floats that dont have a decimal part
             {
                 Eat();
-                AddToken(TokenType.Float, float.Parse(src.Substring(start, length-1)));
+                AddToken(TokenType.FloatLiteral, float.Parse(src.Substring(start, length-1)));
                 return;
             }
 
-            AddToken(TokenType.Int, int.Parse(src.Substring(start, length)));
+            AddToken(TokenType.IntLiteral, int.Parse(src.Substring(start, length)));
         }
 
         void GetString()
@@ -199,11 +203,24 @@ namespace emiT_C
             {
                 throw new Exception("Unclosed string at line " + line);
             }
+            string value = src.Substring(start + 1, length - 1);
 
             Eat(); //the closing "
 
-            string value = src.Substring(start + 1, length - 1);
-            AddToken(TokenType.String, value);
+
+            AddToken(TokenType.StringLiteral, value);
+        }
+        void GetChar()
+        {
+            char value = Eat();
+            if (IsAtEnd)
+            {
+                throw new Exception("Unclosed char at line " + line);
+            }
+
+            Eat(); //the closing '
+
+            AddToken(TokenType.CharLiteral, value);
         }
 
         bool Match(char expect)

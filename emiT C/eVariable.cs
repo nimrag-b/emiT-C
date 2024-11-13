@@ -62,16 +62,24 @@ namespace emiT_C
         public Type type;
         public eValue[] inner;
 
+        public int Length => inner.Length;
+
         public eArray(Type type, int length)
         {
             this.type= type;
             inner = new eValue[length];
         }
 
+        public eArray(Type type, eValue[] array)
+        {
+            this.type = type;
+            inner = array;
+        }
+
 
         public object Clone()
         {
-            eArray other = new eArray(type, inner.Length);
+            eArray other = new eArray(type, (eValue[])inner.Clone());
             return other;
         }
     }

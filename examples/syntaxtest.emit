@@ -1,1 +1,25 @@
-(){}
+create x;
+
+x = 1337; //int
+print x;
+
+x = 1337f; //floats
+print x;
+
+x = 13.37; //implicit float
+print x;
+
+x = true; //bool true
+print x;
+
+x = false; //bool false
+print x;
+
+x = 'c'; //char
+print x;
+
+x = "test"; //string
+print x;
+
+print 69;
+

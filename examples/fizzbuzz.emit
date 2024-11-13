@@ -3,13 +3,13 @@ create flag = 0;
 time point;
 
 if (x % 15 == 0){
-    print 71558055;
+    print "fizzbuzz";
     flag = 1;
 }
 
 if (x % 3 == 0){
     if(flag == 0){
-    print 7155;
+    print "fizz";
     flag = 1;
     }
 
@@ -17,7 +17,7 @@ if (x % 3 == 0){
 
 if (x % 5 == 0){
     if(flag == 0){
-    print 8055;
+    print "buzz";
     flag = 1;
     }
 }

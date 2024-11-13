@@ -208,10 +208,9 @@ namespace emiT_C
         public override IEnumerable Evaluate(Timeline t)
         {
             eValue val = contents.Evaluate(t);
-            string str = val.ToString();
             if(val.type != Type.Null)
             {
-                Console.WriteLine(str);
+                Console.WriteLine(StdLib.GetString(val));
             }
             yield return null;
         }

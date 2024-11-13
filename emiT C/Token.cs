@@ -29,10 +29,12 @@ namespace emiT_C
     public enum TokenType
     {
         Symbol,
-        Int,
-        Float,
-        String,
-        Bool,
+        CharLiteral,
+        IntLiteral,
+        FloatLiteral,
+        StringLiteral,
+        BoolLiteralTrue,
+        BoolLiteralFalse,
 
         Type,
 
