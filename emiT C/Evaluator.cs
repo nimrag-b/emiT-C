@@ -122,9 +122,9 @@ namespace emiT_C
                 case Operand.Equals:
                     return new eValue(Type.Bool, (int)left.value == (int)right.value);
                 case Operand.Less:
-                    return new eValue(Type.Bool, (int)left.value > (int)right.value);
-                case Operand.Greater:
                     return new eValue(Type.Bool, (int)left.value < (int)right.value);
+                case Operand.Greater:
+                    return new eValue(Type.Bool, (int)left.value > (int)right.value);
                 default:
                     throw new NotImplementedException();
             }
@@ -138,15 +138,15 @@ namespace emiT_C
                 case Operand.Equals:
                     return new eValue(Type.Bool, (float)left.value == (float)right.value);
                 case Operand.Less:
-                    return new eValue(Type.Bool, (float)left.value > (float)right.value);
-                case Operand.Greater:
                     return new eValue(Type.Bool, (float)left.value < (float)right.value);
+                case Operand.Greater:
+                    return new eValue(Type.Bool, (float)left.value > (float)right.value);
                 default:
                     throw new NotImplementedException();
             }
         }
 
-        public static eValue EvaluateIsStmt(IsStmt stmt, Timeline t)
+        public static eValue EvaluateIsExpr(IsExpr stmt, Timeline t)
         {
             eVariable? var = t.GetActualVariable(stmt.varName.varName);
             if (var == null)

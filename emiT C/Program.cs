@@ -50,7 +50,12 @@ internal class Program
 
         List<Statement> statements = parser.Parse(tokens);
 
-        Timeline original = new Timeline(new Dictionary<string, eVariable>(), new Dictionary<string, eTime>(), statements, 0);
+        //foreach (var item in statements)
+        //{
+        //    Console.WriteLine(item);
+        //}
+
+        Timeline original = new Timeline(new Dictionary<string, eVariable>(), new Dictionary<string, eTime>(), new CodeBlockStmt(statements), 0);
 
         Console.WriteLine("Timelines Created: " +original.Run());
         Console.WriteLine("Press any key to continue...");

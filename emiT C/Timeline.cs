@@ -11,9 +11,9 @@ namespace emiT_C
         public Dictionary<string, eVariable> variables;
         public Dictionary<string, eTime> times;
 
-        public List<Statement> statements;
+        public CodeBlockStmt rootContext;
 
-        public int CurTimeIndex;
+        public CodeBlockStmt context;
 
         public int Timelines;
 
@@ -22,17 +22,17 @@ namespace emiT_C
         /// </summary>
         public bool Unstable;
 
-        public Timeline(Dictionary<string, eVariable> variables, Dictionary<string, eTime> times,List<Statement> statements, int curTimeIndex)
+        public Timeline(Dictionary<string, eVariable> variables, Dictionary<string, eTime> times, CodeBlockStmt rootContext, int curTimeIndex)
         {
             this.variables = variables;
             this.times = times;
-            this.statements = statements;
-            CurTimeIndex = curTimeIndex;
+            this.rootContext = rootContext;
+            rootContext.CurTimeIndex = curTimeIndex;
         }
 
         public Timeline Branch(eTime time)
         {
-            return new Timeline(time.variables, time.times, time.statements, time.SavedTimeIndex);
+            return new Timeline(time.variables, time.times, time.rootContext, time.SavedTimeIndex);
         }
 
         public void RecalculateTimeIndexes(int point, int length)
@@ -51,8 +51,8 @@ namespace emiT_C
             eTime time = new eTime(
                 variables.ToDictionary(entry => entry.Key, entry => (eVariable)entry.Value.Clone()),
                 times.ToDictionary(entry => entry.Key, entry => (eTime)entry.Value.Clone()), //doesnt need to be a deep copy since eTimes are essentially immutable
-                new List<Statement>(statements), //can be even shallower copy
-                CurTimeIndex
+                new CodeBlockStmt(rootContext.codeblock.ToList()), //can be even shallower copy
+                rootContext.CurTimeIndex
                 );
             times.Add(name, time);
         }
@@ -122,6 +122,14 @@ namespace emiT_C
 
             }
         }
+        public Statement Peek()
+        {
+            return context.codeblock[context.CurTimeIndex+1];
+        }
+        public Statement At()
+        {
+            return context.codeblock[context.CurTimeIndex];
+        }
 
         public void CreateParadox(string paradox)
         {
@@ -137,12 +145,14 @@ namespace emiT_C
         public int Run()
         {
             Timelines++;
-            while(CurTimeIndex < statements.Count && !Unstable)
-            {
-                eValue val = statements[CurTimeIndex].Evaluate(this);
-                //Console.WriteLine(CurTimeIndex + "::" + statements[CurTimeIndex] + "-> "+ val);
-                CurTimeIndex++;;
-            }
+
+            rootContext.Evaluate(this);
+            //while(CurTimeIndex < rootContext.codeblock.Count && !Unstable)
+            //{
+            //    eValue val = At().Evaluate(this);
+            //    //Console.WriteLine(CurTimeIndex + "::" + At() + "-> "+ val);
+            //    CurTimeIndex++;;
+            //}
             //Console.WriteLine("Timeline Collapsed");
             return Timelines;
         }

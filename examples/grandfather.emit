@@ -1,3 +1,5 @@
+//creates an infinite loop until stack overflow
+
 create x = 10;
 
 time strike;
@@ -11,6 +13,6 @@ if(x is alive){
     traveler warps strike{
         x = x + 1;
         traveler kills traveler; //kill self, preventing paradoxes by interfering with itself
-    };
+    }
 
-};
+}

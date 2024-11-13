@@ -44,15 +44,31 @@ namespace emiT_C
 
         Statement ParseLine()
         {
-            Statement stat = ParseStatement();
 
-            Expect(TokenType.SemiColon);
+            if(At().type == TokenType.OpenBracket)
+            {
+                return ParseCodeBlock(); //parse code block
+            }
 
-            return stat;
+            Statement stat = ParseStatement(); //parse statement normally
+
+            if(stat is IActorStmt) //if statement is tagged as an actor, dont require a semicolon to end
+            {
+                //todo - check wether there is a valid expression next in the block
+                return stat;
+            }
+            else if(At().type == TokenType.SemiColon)
+            {
+                Eat();
+                return stat;
+            }
+
+            throw new Exception($"Unclosed Statement at line {At().line}");
         }
 
         Statement ParseStatement()
         {
+
             switch (At().type)
             {
                 case TokenType.Create:
@@ -66,10 +82,14 @@ namespace emiT_C
                 case TokenType.Collapse:
                     Eat();
                     return new CollapseStmt();
+
+
+                case TokenType.OpenBracket: //parse code block
+                    return ParseCodeBlock();
             }
 
             //for expressions that start with the variable
-            ExprVariable lhs = (ExprVariable)ParseToken();
+            ExprVariable lhs = ParseVariable();
 
             switch (At().type)
             {
@@ -97,10 +117,7 @@ namespace emiT_C
             Expect(TokenType.Warps);
             string point = Eat().symbol;
 
-
-            List<Statement> statements = ParseCodeBlock();
-
-            return new BranchStmt(point,lhs,statements);
+            return new BranchStmt(point,lhs);
         }
 
         Statement ParseKills(ExprVariable lhs)
@@ -143,12 +160,10 @@ namespace emiT_C
             ExprBool condition = (ExprBool)ParseBool();
             Expect(TokenType.CloseParen);
 
-            List<Statement> statements = ParseCodeBlock();
-
-            return new IfStmt(condition, statements);
+            return new IfStmt(condition);
         }
 
-        List<Statement> ParseCodeBlock()
+        Statement ParseCodeBlock()
         {
             List<Statement> statements = new List<Statement>();
             Expect(TokenType.OpenBracket);
@@ -157,31 +172,8 @@ namespace emiT_C
                 statements.Add(ParseLine());
             }
             Eat();
-            return statements;
+            return new CodeBlockStmt(statements);
         }
-
-
-        Expression ParseToken()
-        {
-            switch (At().type)
-            {
-                case TokenType.EOF:
-                    break;
-
-                case TokenType.Symbol:
-                    return new ExprVariable(Eat().symbol);
-                case TokenType.Int:
-                case TokenType.Float:
-                case TokenType.String:
-                    return ParseLiteral();
-
-
-                   
-            }
-
-            throw new Exception("Unrecognized token: "+ At().type);
-        }
-
 
 
         Expression ParseLiteral()
@@ -196,7 +188,18 @@ namespace emiT_C
                     return new ExprLiteral((bool)At().value, GetType(Eat().type));
             }
 
-            throw new Exception("Literal type not found");
+            return ParseVariable();
+        }
+
+        ExprVariable ParseVariable()
+        {
+
+            if(At().type == TokenType.Symbol)
+            {
+                return new ExprVariable(Eat().symbol);
+            }
+
+            throw new Exception($"Unexpected token {At().type} at line {At().line}");
         }
         Expression ParsePrimary()
         {
@@ -221,12 +224,12 @@ namespace emiT_C
         Expression ParseIsStmt(ExprVariable lhs)
         {
             Expect(TokenType.Is);
-            return new IsStmt(lhs, GetVarProperty(Eat().type));
+            return new IsExpr(lhs, GetVarProperty(Eat().type));
         }
 
         Expression ParseBooleanExpr(Expression lhs)
         {
-            Operand op = GetOperand(Eat().symbol);
+            Operand op = GetOperand(Eat().type);
 
             Expression rhs = ParseBinaryExpr(0);
 
@@ -240,11 +243,11 @@ namespace emiT_C
 
             if (IsBinaryOp(op.type))
             {
-                int rbp = PrefixBindingPower(op.symbol);
+                int rbp = PrefixBindingPower(op.type);
                 Eat();
                 Expression rhs = ParseBinaryExpr(rbp);
 
-                lhs = new UnaryExpr(rhs, GetOperand(op.symbol));
+                lhs = new UnaryExpr(rhs, GetOperand(op.type));
             }
             else if(op.type == TokenType.OpenParen)
             {
@@ -254,7 +257,7 @@ namespace emiT_C
             }
             else
             {
-                lhs = ParseToken();
+                lhs = ParseLiteral();
             }
 
 
@@ -266,7 +269,7 @@ namespace emiT_C
                     break;
                 }
 
-                (int, int)? bp = InfixBindingPower(op.symbol);
+                (int, int)? bp = InfixBindingPower(op.type);
 
                 if (bp.HasValue)
                 {
@@ -277,7 +280,7 @@ namespace emiT_C
                     Eat();
                     Expression rhs = ParseBinaryExpr(bp.Value.Item2);
 
-                    lhs = new BinaryExpr(lhs, rhs, GetOperand(op.symbol));
+                    lhs = new BinaryExpr(lhs, rhs, GetOperand(op.type));
                     continue;
                 }
 
@@ -290,52 +293,52 @@ namespace emiT_C
 
 
 
-        int PrefixBindingPower(string op)
+        int PrefixBindingPower(TokenType op)
         {
             switch (op)
             {
-                case "-":
-                case "+":
+                case TokenType.Subtract:
+                case TokenType.Add:
                     return 5;
                 default:
                     throw new Exception("Invalid operator:" + op);
             }
         }
 
-        (int,int)? InfixBindingPower(string op)
+        (int,int)? InfixBindingPower(TokenType op)
         {
             switch (op)
             {
-                case "-":
-                case "+":
+                case TokenType.Subtract:
+                case TokenType.Add:
                     return (1,2);
 
-                case "/":
-                case "*":
+                case TokenType.Divide:
+                case TokenType.Multiply:
                     return (3,4);
                 default:
                     return null;
             }
         }
 
-        public Operand GetOperand(string op)
+        public Operand GetOperand(TokenType op)
         {
             switch (op)
             {
-                case "-":
-                    return Operand.Subtract;
-                case "+":
+                case TokenType.Add:
                     return Operand.Add;
-                case "/":
+                case TokenType.Subtract:
+                    return Operand.Subtract;
+                case TokenType.Divide:
                     return Operand.Divide;
-                case "*":
+                case TokenType.Multiply:
                     return Operand.Multiply;
 
-                case "==":
+                case TokenType.Equals:
                     return Operand.Equals;
-                case ">":
+                case TokenType.Less:
                     return Operand.Less;
-                case "<":
+                case TokenType.Greater:
                     return Operand.Greater;
                 default:
                     throw new Exception("unrecognised operator:" + op);

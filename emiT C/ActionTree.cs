@@ -13,6 +13,13 @@ namespace emiT_C
         public abstract eValue Evaluate(Timeline t);
     }
 
+    /// <summary>
+    /// A statement that does an action, ie captures the next block. does not always need to be ended with a semicolon
+    /// </summary>
+    public interface IActorStmt
+    {
+    }
+
     public abstract class Expression : Statement
     {
     }
@@ -31,6 +38,10 @@ namespace emiT_C
             t.CreateTimeFrame(varName);
             return null;
         }
+        public override string ToString()
+        {
+            return $"time {varName}";
+        }
     }
 
     public class KillsStmt : Statement
@@ -46,7 +57,7 @@ namespace emiT_C
         public override eValue Evaluate(Timeline t)
         {
             eVariable? var =  t.GetActualVariable(killer.varName);
-            if(var != null && var.Alive)
+            if (var != null && var.Alive)
             {
                 t.KillVariable(victim.varName);
             }
@@ -71,6 +82,7 @@ namespace emiT_C
 
         public override eValue Evaluate(Timeline t)
         {
+
             t.CreateVariable(varName);
             if(value != null)
             {
@@ -84,7 +96,7 @@ namespace emiT_C
         {
             if(value != null)
             {
-                return $"create {varName} ({value.ToString})";
+                return $"create {varName} ({value})";
             }
             return $"create {varName}";
         }
@@ -115,12 +127,12 @@ namespace emiT_C
     public abstract class ExprBool : Expression
     {
     }
-    public class IsStmt : ExprBool
+    public class IsExpr : ExprBool
     {
         public ExprVariable varName;
         public VarProperty property;
 
-        public IsStmt(ExprVariable varName, VarProperty property)
+        public IsExpr(ExprVariable varName, VarProperty property)
         {
             this.varName = varName;
             this.property = property;
@@ -128,7 +140,7 @@ namespace emiT_C
 
         public override eValue Evaluate(Timeline t)
         {
-            return Evaluator.EvaluateIsStmt(this, t);
+            return Evaluator.EvaluateIsExpr(this, t);
         }
 
         public override string ToString()
@@ -137,18 +149,15 @@ namespace emiT_C
         }
     }
 
-    public class BranchStmt: Statement
+    public class BranchStmt: Statement, IActorStmt
     {
         public string timeName;
         public ExprVariable traveler;
 
-        public List<Statement> statements;
-
-        public BranchStmt(string timeName, ExprVariable traveler, List<Statement> statements)
+        public BranchStmt(string timeName, ExprVariable traveler)
         {
             this.timeName = timeName;
             this.traveler = traveler;
-            this.statements = statements;
         }
 
         public override eValue Evaluate(Timeline t)
@@ -161,13 +170,22 @@ namespace emiT_C
 
             Timeline newtimeline = t.Branch(time);
 
+            Statement action = t.Peek(); //get the next statement
+            if(action == null)
+            {
+                throw new Exception($"No statement found to branch from");
+            }
 
-            newtimeline.statements.InsertRange(time.SavedTimeIndex+1, statements); //add the time travellers actions to the new timeline
-            newtimeline.statements.Insert(time.SavedTimeIndex+1, new CreateStmt(traveler.varName, traveler)); //create the traveller in the new timeline
-            //newtimeline.CreateVariable(traveler.varName);
-            //newtimeline.SetVariable(traveler.varName,traveler.Evaluate(t));
-            //TODO: add it so that the traveller can wait until something else to do something
-            newtimeline.RecalculateTimeIndexes(time.SavedTimeIndex+1, statements.Count);
+            newtimeline.rootContext.codeblock.Insert(time.SavedTimeIndex+1, action); //add the time travellers actions to the new timeline
+            newtimeline.rootContext.codeblock.Insert(time.SavedTimeIndex+1, new CreateStmt(traveler.varName, traveler)); //create the traveller in the new timeline
+            //TODO: add it so that the traveller can wait until something else to do somethings
+            newtimeline.RecalculateTimeIndexes(time.SavedTimeIndex+1, 1);
+
+            //Console.WriteLine("New Timeline:");
+            //foreach (Statement v in newtimeline.rootContext.codeblock)
+            //{
+            //    Console.WriteLine(v);
+            //}
 
             t.Timelines += newtimeline.Run(); //start the new timeline
             return null;
@@ -194,27 +212,22 @@ namespace emiT_C
         }
     }
 
-    public class IfStmt : Statement
+    public class IfStmt : Statement, IActorStmt
     {
         public ExprBool condition;
-        public List<Statement> codeblock;
 
-        public IfStmt(ExprBool condition, List<Statement> codeblock)
+        public IfStmt(ExprBool condition)
         {
             this.condition = condition;
-            this.codeblock = codeblock;
         }
 
         public override eValue Evaluate(Timeline t)
         {
             eValue cond = condition.Evaluate(t);
 
-            if ((bool)cond.value)
+            if (!(bool)cond.value) //if condution is false, skip next statement
             {
-                foreach (var item in codeblock)
-                {
-                    item.Evaluate(t);
-                }
+                t.context.CurTimeIndex++;
             }
             return cond;
         }
@@ -222,14 +235,6 @@ namespace emiT_C
         public override string ToString()
         {
             StringBuilder cond = new StringBuilder($"if ({condition})");
-            cond.AppendLine();
-            cond.AppendLine("[");
-            foreach (var item in codeblock)
-            {
-                cond.AppendLine(item.ToString());
-            }
-            cond.AppendLine("]");
-
             return cond.ToString();
         }
     }
@@ -240,6 +245,53 @@ namespace emiT_C
         {
             t.Destabilize();
             return null;
+        }
+    }
+
+    public class CodeBlockStmt : Statement
+    {
+        public List<Statement> codeblock;
+
+        public int CurTimeIndex = 0;
+
+        public CodeBlockStmt(List<Statement> codeblock)
+        {
+            this.codeblock= codeblock;
+        }
+        public override eValue Evaluate(Timeline t)
+        {
+            int InitialTimeIndex = CurTimeIndex;
+            //CurTimeIndex = 0;
+            CodeBlockStmt savedContext = t.context;
+            t.context = this;
+            //Console.WriteLine("    Entering Block with count "+ codeblock.Count);
+            //Console.WriteLine("    CurTime: "+ CurTimeIndex);
+            while (CurTimeIndex < codeblock.Count && !t.Unstable)
+            {
+                if (t.Unstable)
+                {
+                    throw new Exception();
+                }
+                //Console.WriteLine(CurTimeIndex + "::" + codeblock[CurTimeIndex]);
+                eValue val = codeblock[CurTimeIndex].Evaluate(t);
+                //Console.WriteLine(CurTimeIndex + "::" + codeblock[CurTimeIndex] + "-> " + val);
+                CurTimeIndex++;
+            }
+            //Console.WriteLine("    Exiting Block");
+            CurTimeIndex = InitialTimeIndex;
+            t.context = savedContext;
+            return null;
+        }
+        public override string ToString()
+        {
+            StringBuilder cond = new StringBuilder();
+            cond.AppendLine("[");
+            foreach (var item in codeblock)
+            {
+                cond.AppendLine("    "+ item.ToString());
+            }
+            cond.AppendLine("]");
+            return cond.ToString();
         }
     }
 
