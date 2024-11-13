@@ -166,6 +166,8 @@ namespace emiT_C
         public override IEnumerable Evaluate(Timeline t)
         {
             eTime? time = t.GetTime(timeName);
+
+            eValue value = traveler.Evaluate(t);
             if(time == null)
             {
                 throw new Exception($"Point {timeName} does not exist at this point in time.");
@@ -180,7 +182,7 @@ namespace emiT_C
             }
 
             newtimeline.rootContext.codeblock.Insert(time.SavedTimeIndex+1, action); //add the time travellers actions to the new timeline
-            newtimeline.rootContext.codeblock.Insert(time.SavedTimeIndex+1, new CreateStmt(traveler.varName, traveler)); //create the traveller in the new timeline
+            newtimeline.rootContext.codeblock.Insert(time.SavedTimeIndex+1, new ArriveStmt(traveler.varName, value)); //create the traveller in the new timeline
             //TODO: add it so that the traveller can wait until something else to do somethings
             newtimeline.RecalculateTimeIndexes(time.SavedTimeIndex+1, 1);
 
@@ -192,6 +194,31 @@ namespace emiT_C
             t.multiverse.ChangeTimeline(newtimeline);
             //t.Timelines +=
             //newtimeline.Run(); //start the new timeline
+            yield return null;
+        }
+    }
+
+    public class ArriveStmt : Statement
+    {
+        public string traveler;
+
+        public eValue? value;
+
+        public ArriveStmt(string traveler, eValue? value)
+        {
+            this.traveler = traveler;
+            this.value = value;
+        }
+
+        public override IEnumerable Evaluate(Timeline t)
+        {
+
+            t.CreateVariable(traveler);
+            if (value != null)
+            {
+                t.SetVariable(traveler, value.Value);
+                yield return value.Value;
+            }
             yield return null;
         }
     }
@@ -274,7 +301,7 @@ namespace emiT_C
 
             while (CurTimeIndex < codeblock.Count && !t.Unstable)
             {
-                //sConsole.WriteLine($"    {CurTimeIndex}::{codeblock[CurTimeIndex]}");
+                //Console.WriteLine($"    {CurTimeIndex}::{codeblock[CurTimeIndex]}");
                 IEnumerator block =  codeblock[CurTimeIndex].Evaluate(t).GetEnumerator();
                 while(block.MoveNext())
                 {
@@ -428,7 +455,7 @@ namespace emiT_C
             {
                 return ((eArray)arrVal.value).inner[indexVal];
             }
-            throw new Exception("Tried to index a non-array value");
+            throw new Exception("Tried to index a non-array value " + arrVal.value.GetType());
         }
     }
 

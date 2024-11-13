@@ -15,11 +15,12 @@ internal class Program
         if (args.Length == 0)
         {
             string exefolder = System.Reflection.Assembly.GetEntryAssembly().Location;
-            src = File.ReadAllText(Path.GetFullPath(Path.Combine(exefolder, "..", "..", "..", "..","..","examples", "syntaxtest.emit")));
+            src = File.ReadAllText(Path.GetFullPath(Path.Combine(exefolder, "..", "..", "..", "..","..","examples", "fibonacci.emit")));
         }
         else
         {
             src = File.ReadAllText(args[0]);
+
         }
 #elif RELEASE
         if(args.Length != 0)
