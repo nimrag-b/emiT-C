@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,44 +17,28 @@ namespace emiT_C
             switch (left.type)
             {
                 case Type.Int:
-                    return EvaluateIntBinaryExpr(binaryExpr, t, left);
+                    return EvaluateGenericBinaryExpr<int>(Type.Int,binaryExpr, t, left);
                 case Type.Float:
-                    return EvaluateFloatBinaryExpr(binaryExpr, t, left);
+                    return EvaluateGenericBinaryExpr<float>(Type.Float, binaryExpr, t, left);
                 default:
                     throw new NotImplementedException();
             }
         }
-
-        static eValue EvaluateIntBinaryExpr(BinaryExpr binaryExpr, Timeline t, eValue left)
+        static eValue EvaluateGenericBinaryExpr<T>(Type type, BinaryExpr binaryExpr, Timeline t, eValue left) where T : INumber<T>
         {
             eValue right = binaryExpr.right.Evaluate(t);
             switch (binaryExpr.op)
             {
                 case Operand.Add:
-                    return new eValue(Type.Int, (int)left.value + (int)right.value);
+                    return new eValue(type, (T)left.value + (T)right.value);
                 case Operand.Subtract:
-                    return new eValue(Type.Int, (int)left.value - (int)right.value);
+                    return new eValue(type, (T)left.value - (T)right.value);
                 case Operand.Multiply:
-                    return new eValue(Type.Int, (int)left.value * (int)right.value);
+                    return new eValue(type, (T)left.value * (T)right.value);
                 case Operand.Divide:
-                    return new eValue(Type.Int, (int)left.value / (int)right.value);
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-        static eValue EvaluateFloatBinaryExpr(BinaryExpr binaryExpr, Timeline t, eValue left)
-        {
-            eValue right = binaryExpr.right.Evaluate(t);
-            switch (binaryExpr.op)
-            {
-                case Operand.Add:
-                    return new eValue(Type.Float, (float)left.value + (float)right.value);
-                case Operand.Subtract:
-                    return new eValue(Type.Float, (float)left.value - (float)right.value);
-                case Operand.Multiply:
-                    return new eValue(Type.Float, (float)left.value * (float)right.value);
-                case Operand.Divide:
-                    return new eValue(Type.Float, (float)left.value / (float)right.value);
+                    return new eValue(type, (T)left.value / (T)right.value);
+                case Operand.Modulus:
+                    return new eValue(type, (T)left.value % (T)right.value);
                 default:
                     throw new NotImplementedException();
             }
@@ -66,34 +51,21 @@ namespace emiT_C
             switch (right.type)
             {
                 case Type.Int:
-                    return EvaluateIntUnaryExpr(right,unaryExpr.op, t);
+                    return EvaluateGenericUnaryExpr<int>(Type.Int, right,unaryExpr.op, t);
                 case Type.Float:
-                    return EvaluateFloatUnaryExpr(right, unaryExpr.op, t);
+                    return EvaluateGenericUnaryExpr<float>(Type.Float, right, unaryExpr.op, t);
                 default:
                     throw new NotImplementedException();
             }
         }
-        public static eValue EvaluateIntUnaryExpr(eValue right, Operand op, Timeline t)
+        public static eValue EvaluateGenericUnaryExpr<T>(Type type, eValue right, Operand op, Timeline t) where T : INumber<T>
         {
             switch (op)
             {
                 case Operand.Add:
-                    return new eValue(Type.Int, +(int)right.value);
+                    return new eValue(type, +(T)right.value);
                 case Operand.Subtract:
-                    return new eValue(Type.Int, -(int)right.value);
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        public static eValue EvaluateFloatUnaryExpr(eValue right, Operand op, Timeline t)
-        {
-            switch (op)
-            {
-                case Operand.Add:
-                    return new eValue(Type.Float, +(float)right.value);
-                case Operand.Subtract:
-                    return new eValue(Type.Float, -(float)right.value);
+                    return new eValue(type, -(T)right.value);
                 default:
                     throw new NotImplementedException();
             }
@@ -106,41 +78,29 @@ namespace emiT_C
             switch (left.type)
             {
                 case Type.Int:
-                    return EvaluateIntBooleanExpr(booleanExpr, t, left);
+                    return EvaluateGenericBooleanExpr<int>(booleanExpr, t, left);
                 case Type.Float:
-                    return EvaluateFloatBooleanExpr(booleanExpr, t, left);
+                    return EvaluateGenericBooleanExpr<float>(booleanExpr, t, left);
                 default:
                     throw new NotImplementedException();
             }
         }
 
-        public static eValue EvaluateIntBooleanExpr(BooleanExpr booleanExpr, Timeline t, eValue left)
+        public static eValue EvaluateGenericBooleanExpr<T>(BooleanExpr booleanExpr, Timeline t, eValue left) where T : IComparable<T>
         {
             eValue right = booleanExpr.right.Evaluate(t);
             switch (booleanExpr.op)
             {
                 case Operand.Equals:
-                    return new eValue(Type.Bool, (int)left.value == (int)right.value);
+                    return new eValue(Type.Bool, ((T)left.value).Equals((T)right.value));
                 case Operand.Less:
-                    return new eValue(Type.Bool, (int)left.value < (int)right.value);
+                    return new eValue(Type.Bool, ((T)left.value).CompareTo((T)right.value) < 0);
                 case Operand.Greater:
-                    return new eValue(Type.Bool, (int)left.value > (int)right.value);
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        public static eValue EvaluateFloatBooleanExpr(BooleanExpr booleanExpr, Timeline t, eValue left)
-        {
-            eValue right = booleanExpr.right.Evaluate(t);
-            switch (booleanExpr.op)
-            {
-                case Operand.Equals:
-                    return new eValue(Type.Bool, (float)left.value == (float)right.value);
-                case Operand.Less:
-                    return new eValue(Type.Bool, (float)left.value < (float)right.value);
-                case Operand.Greater:
-                    return new eValue(Type.Bool, (float)left.value > (float)right.value);
+                    return new eValue(Type.Bool, ((T)left.value).CompareTo((T)right.value) > 0);
+                case Operand.LessOrEqual:
+                    return new eValue(Type.Bool, ((T)left.value).CompareTo((T)right.value) <= 0);
+                case Operand.GreaterOrEqual:
+                    return new eValue(Type.Bool, ((T)left.value).CompareTo((T)right.value) >= 0);
                 default:
                     throw new NotImplementedException();
             }

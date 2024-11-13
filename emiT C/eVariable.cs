@@ -10,7 +10,7 @@ namespace emiT_C
     {
         public bool Alive = true;
 
-        public eValue value = new eValueNull();
+        public eValue value;
 
         public eVariable()
         {
@@ -24,7 +24,7 @@ namespace emiT_C
 
         public object Clone()
         {
-            return new eVariable((eValue)value.Clone());
+            return new eVariable(value);
         }
 
         public override string ToString()
@@ -33,23 +33,13 @@ namespace emiT_C
         }
     }
 
-    public class eValueNull : eValue
-    {
-        public eValueNull() : base(Type.Int, 0)
-        {
-        }
-
-        public object Clone() //may break with non reference object types. oh well! shouldnt happen anyway
-        {
-            return new eValueNull();
-        }
-    }
-
-    public class eValue : ICloneable
+    public struct eValue
     {
         public Type type;
 
         public object value;
+
+        public static eValue Null => new eValue(Type.Null, 0);
 
         public eValue(Type type, object value)
         {
@@ -57,14 +47,32 @@ namespace emiT_C
             this.value = value;
         }
 
-        public object Clone() //may break with non reference object types. oh well! shouldnt happen anyway
-        {
-            return new eValue(type, value);
-        }
-
         public override string ToString()
         {
+            if(type == Type.Null)
+            {
+                return "Null";
+            }
             return value.ToString();
+        }
+    }
+
+    public class eArray : ICloneable
+    {
+        public Type type;
+        public eValue[] inner;
+
+        public eArray(Type type, int length)
+        {
+            this.type= type;
+            inner = new eValue[length];
+        }
+
+
+        public object Clone()
+        {
+            eArray other = new eArray(type, inner.Length);
+            return other;
         }
     }
 

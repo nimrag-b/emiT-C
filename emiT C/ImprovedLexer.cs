@@ -76,6 +76,8 @@ namespace emiT_C
                     AddToken(TokenType.Add); break;
                 case '*':
                     AddToken(TokenType.Multiply); break;
+                case '%':
+                    AddToken(TokenType.Modulus); break;
 
 
 

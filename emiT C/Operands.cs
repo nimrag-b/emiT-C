@@ -13,17 +13,22 @@ namespace emiT_C
         Subtract, 
         Multiply, 
         Divide,
+        Modulus,
 
         //boolean
         Equals,
         Greater,
         Less,
+        LessOrEqual,
+        GreaterOrEqual
     }
 
-    public enum Type
+    public enum Type : byte
     {
+        Null,
         Int,
         Float,
+        String,
         Bool
     }
 }

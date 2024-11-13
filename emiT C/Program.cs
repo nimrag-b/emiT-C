@@ -1,7 +1,6 @@
 ﻿using emiT_C;
 using emiT_C.Legacy;
 using System.IO;
-using emiT_C;
 using Token = emiT_C.Token;
 
 internal class Program
@@ -16,7 +15,7 @@ internal class Program
         if (args.Length == 0)
         {
             string exefolder = System.Reflection.Assembly.GetEntryAssembly().Location;
-            src = File.ReadAllText(Path.GetFullPath(Path.Combine(exefolder, "..", "..", "..", "..","..","examples","fizzbuzz.emit")));
+            src = File.ReadAllText(Path.GetFullPath(Path.Combine(exefolder, "..", "..", "..", "..","..","examples","grandfather.emit")));
         }
         else
         {
@@ -54,10 +53,13 @@ internal class Program
         //{
         //    Console.WriteLine(item);
         //}
+        Multiverse multiverse = new Multiverse();
 
-        Timeline original = new Timeline(new Dictionary<string, eVariable>(), new Dictionary<string, eTime>(), new CodeBlockStmt(statements), 0);
+        Timeline original = new Timeline(multiverse, new Dictionary<string, eVariable>(), new Dictionary<string, eTime>(), new CodeBlockStmt(statements), 0, 0);
 
-        Console.WriteLine("Timelines Created: " +original.Run());
+
+
+        multiverse.Run(original);
         Console.WriteLine("Press any key to continue...");
         Console.ReadKey();
     }

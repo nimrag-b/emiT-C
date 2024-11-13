@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,31 +9,37 @@ namespace emiT_C
 {
     public class Timeline
     {
+        public Multiverse multiverse;
         public Dictionary<string, eVariable> variables;
         public Dictionary<string, eTime> times;
+
+        public IEnumerator Enumerator;
 
         public CodeBlockStmt rootContext;
 
         public CodeBlockStmt context;
 
-        public int Timelines;
+        public int depth;
 
         /// <summary>
         /// unstable timelines will collapse.
         /// </summary>
         public bool Unstable;
 
-        public Timeline(Dictionary<string, eVariable> variables, Dictionary<string, eTime> times, CodeBlockStmt rootContext, int curTimeIndex)
+
+        public Timeline(Multiverse multiverse, Dictionary<string, eVariable> variables, Dictionary<string, eTime> times, CodeBlockStmt rootContext, int curTimeIndex, int depth)
         {
+            this.multiverse = multiverse;
             this.variables = variables;
             this.times = times;
             this.rootContext = rootContext;
             rootContext.CurTimeIndex = curTimeIndex;
+            this.depth = depth;
         }
 
         public Timeline Branch(eTime time)
         {
-            return new Timeline(time.variables, time.times, time.rootContext, time.SavedTimeIndex);
+            return new Timeline(multiverse,time.variables, time.times, time.rootContext, time.SavedTimeIndex, depth+1);
         }
 
         public void RecalculateTimeIndexes(int point, int length)
@@ -142,11 +149,17 @@ namespace emiT_C
             Unstable = true;
         }
 
-        public int Run()
+        public void SetEnumerator()
         {
-            Timelines++;
+            Enumerator = rootContext.Evaluate(this).GetEnumerator();
+        }
+
+        public void Run()
+        {
+            Console.WriteLine("Starting");
 
             rootContext.Evaluate(this);
+
             //while(CurTimeIndex < rootContext.codeblock.Count && !Unstable)
             //{
             //    eValue val = At().Evaluate(this);
@@ -154,8 +167,6 @@ namespace emiT_C
             //    CurTimeIndex++;;
             //}
             //Console.WriteLine("Timeline Collapsed");
-            return Timelines;
         }
-
     }
 }

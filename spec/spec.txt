@@ -67,6 +67,7 @@ Float - a 32 bit float
 - - subtraction
 * - multiplication
 / - division
+% - modulus
 
 --UNARY
 prefix

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -10,7 +12,7 @@ namespace emiT_C
 {
     public abstract class Statement
     {
-        public abstract eValue Evaluate(Timeline t);
+        public abstract IEnumerable Evaluate(Timeline t);
     }
 
     /// <summary>
@@ -20,8 +22,9 @@ namespace emiT_C
     {
     }
 
-    public abstract class Expression : Statement
+    public abstract class Expression
     {
+        public abstract eValue Evaluate(Timeline t);
     }
 
     public class CreateTime : Statement
@@ -33,10 +36,10 @@ namespace emiT_C
             this.varName = varName;
         }
 
-        public override eValue Evaluate(Timeline t)
+        public override IEnumerable Evaluate(Timeline t)
         {
             t.CreateTimeFrame(varName);
-            return null;
+            yield return null;
         }
         public override string ToString()
         {
@@ -54,14 +57,14 @@ namespace emiT_C
             this.killer = killer;
             this.victim = victim;
         }
-        public override eValue Evaluate(Timeline t)
+        public override IEnumerable Evaluate(Timeline t)
         {
             eVariable? var =  t.GetActualVariable(killer.varName);
             if (var != null && var.Alive)
             {
                 t.KillVariable(victim.varName);
             }
-            return null;
+            yield return null;
         }
         public override string ToString()
         {
@@ -80,7 +83,7 @@ namespace emiT_C
             this.value = value;
         }
 
-        public override eValue Evaluate(Timeline t)
+        public override IEnumerable Evaluate(Timeline t)
         {
 
             t.CreateVariable(varName);
@@ -88,9 +91,9 @@ namespace emiT_C
             {
                 eValue stat = value.Evaluate(t);
                 t.SetVariable(varName, stat);
-                return stat;
+                yield return stat;
             }
-            return null;
+            yield return null;
         }
         public override string ToString()
         {
@@ -113,11 +116,11 @@ namespace emiT_C
             this.right = right;
         }
 
-        public override eValue Evaluate(Timeline t)
+        public override IEnumerable Evaluate(Timeline t)
         {
-            eValue r = (eValue)right.Evaluate(t).Clone();
+            eValue r = right.Evaluate(t);
             t.SetVariable(varName.varName, r);
-            return r;
+            yield return null;
         }
         public override string ToString()
         {
@@ -140,7 +143,7 @@ namespace emiT_C
 
         public override eValue Evaluate(Timeline t)
         {
-            return Evaluator.EvaluateIsExpr(this, t);
+             return Evaluator.EvaluateIsExpr(this, t);
         }
 
         public override string ToString()
@@ -160,7 +163,7 @@ namespace emiT_C
             this.traveler = traveler;
         }
 
-        public override eValue Evaluate(Timeline t)
+        public override IEnumerable Evaluate(Timeline t)
         {
             eTime? time = t.GetTime(timeName);
             if(time == null)
@@ -186,9 +189,10 @@ namespace emiT_C
             //{
             //    Console.WriteLine(v);
             //}
-
-            t.Timelines += newtimeline.Run(); //start the new timeline
-            return null;
+            t.multiverse.ChangeTimeline(newtimeline);
+            //t.Timelines +=
+            //newtimeline.Run(); //start the new timeline
+            yield return null;
         }
     }
 
@@ -201,14 +205,15 @@ namespace emiT_C
             this.contents = contents;
         }
 
-        public override eValue Evaluate(Timeline t)
+        public override IEnumerable Evaluate(Timeline t)
         {
             eValue val = contents.Evaluate(t);
-            if(val != null)
+            string str = val.ToString();
+            if(val.type != Type.Null)
             {
-                Console.WriteLine(contents.Evaluate(t).ToString());
+                Console.WriteLine(str);
             }
-            return val;
+            yield return null;
         }
     }
 
@@ -221,7 +226,7 @@ namespace emiT_C
             this.condition = condition;
         }
 
-        public override eValue Evaluate(Timeline t)
+        public override IEnumerable Evaluate(Timeline t)
         {
             eValue cond = condition.Evaluate(t);
 
@@ -229,7 +234,7 @@ namespace emiT_C
             {
                 t.context.CurTimeIndex++;
             }
-            return cond;
+            yield return null;
         }
 
         public override string ToString()
@@ -241,10 +246,10 @@ namespace emiT_C
 
     public class CollapseStmt : Statement
     {
-        public override eValue Evaluate(Timeline t)
+        public override IEnumerable Evaluate(Timeline t)
         {
             t.Destabilize();
-            return null;
+            yield return null;
         }
     }
 
@@ -252,45 +257,46 @@ namespace emiT_C
     {
         public List<Statement> codeblock;
 
-        public int CurTimeIndex = 0;
+        public int CurTimeIndex = 0; //this is causing the problem, basically its getting stuck at the execution point, and the statement is not copies to the next timeline, only referenced, which is fine for every other statement but this one. also, the timeline needs a way to navigate exactly back to the point it is at befpre.
 
         public CodeBlockStmt(List<Statement> codeblock)
         {
             this.codeblock= codeblock;
         }
-        public override eValue Evaluate(Timeline t)
+        public override IEnumerable Evaluate(Timeline t)
         {
-            int InitialTimeIndex = CurTimeIndex;
+            int InitialTimeIndex = CurTimeIndex; //saved context time for jumps
             //CurTimeIndex = 0;
             CodeBlockStmt savedContext = t.context;
+
             t.context = this;
-            //Console.WriteLine("    Entering Block with count "+ codeblock.Count);
-            //Console.WriteLine("    CurTime: "+ CurTimeIndex);
+            //Console.WriteLine("    Entering Block with count " + codeblock.Count);
+            //Console.WriteLine("    CurTime: " + CurTimeIndex);
+
             while (CurTimeIndex < codeblock.Count && !t.Unstable)
             {
-                if (t.Unstable)
+                //Console.WriteLine($"    {CurTimeIndex}::{codeblock[CurTimeIndex]}");
+                IEnumerator block =  codeblock[CurTimeIndex].Evaluate(t).GetEnumerator();
+                while(block.MoveNext())
                 {
-                    throw new Exception();
+                    yield return null;
                 }
-                //Console.WriteLine(CurTimeIndex + "::" + codeblock[CurTimeIndex]);
-                eValue val = codeblock[CurTimeIndex].Evaluate(t);
-                //Console.WriteLine(CurTimeIndex + "::" + codeblock[CurTimeIndex] + "-> " + val);
                 CurTimeIndex++;
+                //Console.WriteLine("    " + CurTimeIndex + "::" + codeblock[CurTimeIndex] + "-> " + val);
             }
             //Console.WriteLine("    Exiting Block");
             CurTimeIndex = InitialTimeIndex;
             t.context = savedContext;
-            return null;
         }
         public override string ToString()
         {
             StringBuilder cond = new StringBuilder();
-            cond.AppendLine("[");
+            cond.AppendLine("\n    [");
             foreach (var item in codeblock)
             {
-                cond.AppendLine("    "+ item.ToString());
+                cond.AppendLine("        "+ item.ToString());
             }
-            cond.AppendLine("]");
+            cond.AppendLine("    ]");
             return cond.ToString();
         }
     }
@@ -401,7 +407,7 @@ namespace emiT_C
                     return t.variables[varName].value;
                 }
             }
-            return null;
+            return eValue.Null;
         }
         public override string ToString()
         {

@@ -21,9 +21,9 @@ Key-
  --OPERATORS
 
  -Logical operators 
- -% (modulus)
+ +% (modulus)
  - +=, -=, ++, -- (more arithmetic ops)
- - <=, >=, != (more boolean ops)
+ / <=, >=, != (more boolean ops)
 
 
 --LANGUAGE FEATURES

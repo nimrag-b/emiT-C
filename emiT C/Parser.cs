@@ -299,7 +299,7 @@ namespace emiT_C
             {
                 case TokenType.Subtract:
                 case TokenType.Add:
-                    return 5;
+                    return 7;
                 default:
                     throw new Exception("Invalid operator:" + op);
             }
@@ -313,9 +313,13 @@ namespace emiT_C
                 case TokenType.Add:
                     return (1,2);
 
+                case TokenType.Modulus:
+                    return (3,4);
+
                 case TokenType.Divide:
                 case TokenType.Multiply:
-                    return (3,4);
+                    return (5,6);
+
                 default:
                     return null;
             }
@@ -333,6 +337,8 @@ namespace emiT_C
                     return Operand.Divide;
                 case TokenType.Multiply:
                     return Operand.Multiply;
+                case TokenType.Modulus:
+                    return Operand.Modulus;
 
                 case TokenType.Equals:
                     return Operand.Equals;
@@ -340,6 +346,10 @@ namespace emiT_C
                     return Operand.Less;
                 case TokenType.Greater:
                     return Operand.Greater;
+                case TokenType.GreaterOrEqual:
+                    return Operand.GreaterOrEqual;
+                case TokenType.LessOrEqual:
+                    return Operand.LessOrEqual;
                 default:
                     throw new Exception("unrecognised operator:" + op);
             }
