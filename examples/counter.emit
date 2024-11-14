@@ -1,0 +1,15 @@
+//creates an infinite loop until stack overflow
+
+create alpha = 0;
+
+time past;
+
+alpha = alpha + 1;
+print alpha;
+
+create beta;
+beta warps past{
+    alpha = alpha + 1;
+    beta kills beta;
+    time past;
+}

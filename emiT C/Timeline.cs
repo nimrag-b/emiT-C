@@ -61,7 +61,7 @@ namespace emiT_C
                 new CodeBlockStmt(rootContext.codeblock.ToList()), //can be even shallower copy
                 rootContext.CurTimeIndex
                 );
-            times.Add(name, time);
+            times[name] = time;
         }
 
         public eTime? GetTime(string name)
