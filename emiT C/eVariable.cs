@@ -6,21 +6,50 @@ using System.Threading.Tasks;
 
 namespace emiT_C
 {
-    public class eVariable: ICloneable
+    public struct eVariable: ICloneable
     {
-        public bool Alive = true;
 
-        public eValue value;
+        public List<eValueState> Values = new List<eValueState>();
+
+        public int ValuePointer = 0;
+
+        public eValue value => Values[ValuePointer].Value;
+
+        public bool Alive => Values[ValuePointer].Alive;
+
+        public void SetAlive(bool value)
+        {
+            eValueState state = Values[ValuePointer];
+            state.Alive = value;
+            Values[ValuePointer] = state;
+        }
 
         public eVariable()
         {
-
+            AddVariable(eValue.Null);
         }
 
         public eVariable(eValue value)
         {
-            this.value = value;
+            AddVariable(value);
         }
+
+        public void AddVariable(eValue value)
+        {
+            Values.Add(new eValueState(value));
+        }
+
+        public void SetVariable(eValue eValue)
+        {
+            Values[ValuePointer] = new eValueState(eValue);
+        }
+
+        public void SetPointer(int pointer)
+        {
+            ValuePointer = pointer;
+        }
+
+
 
         public object Clone()
         {
@@ -30,6 +59,19 @@ namespace emiT_C
         public override string ToString()
         {
             return value.ToString() + "-> " + Alive;
+        }
+    }
+
+    public struct eValueState
+    {
+        public eValue Value;
+
+        public bool Alive;
+
+        public eValueState(eValue Value, bool Alive = true)
+        {
+            this.Value = Value;
+            this.Alive = Alive;
         }
     }
 

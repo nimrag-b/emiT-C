@@ -76,6 +76,11 @@ namespace emiT_C
         GreaterOrEqual, // <=
         LessOrEqual, // >=
 
+        ShiftTargetForward, // ^>
+        ShiftTargetBack, // ^<
+        SetTargetForward, // :>
+        SetTargetBack, // :<
+
 
 
         //Keywords

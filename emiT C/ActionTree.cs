@@ -60,7 +60,7 @@ namespace emiT_C
         public override IEnumerable Evaluate(Timeline t)
         {
             eVariable? var =  t.GetActualVariable(killer.varName);
-            if (var != null && var.Alive)
+            if (var != null && var.Value.Alive)
             {
                 t.KillVariable(victim.varName);
             }
@@ -93,7 +93,6 @@ namespace emiT_C
                 t.SetVariable(varName, stat);
                 yield return stat;
             }
-            yield return null;
         }
         public override string ToString()
         {
@@ -173,18 +172,17 @@ namespace emiT_C
                 throw new Exception($"Point {timeName} does not exist at this point in time.");
             }
 
-            Timeline newtimeline = t.Branch(time);
+            Timeline newtimeline = t.Branch(time.Value);
 
             Statement action = t.Peek(); //get the next statement
             if(action == null)
             {
                 throw new Exception($"No statement found to branch from");
             }
-
-            newtimeline.rootContext.codeblock.Insert(time.SavedTimeIndex+1, action); //add the time travellers actions to the new timeline
-            newtimeline.rootContext.codeblock.Insert(time.SavedTimeIndex+1, new ArriveStmt(traveler.varName, value)); //create the traveller in the new timeline
+            newtimeline.rootContext.codeblock.Insert(1, action); //add the time travellers actions to the new timeline
+            newtimeline.rootContext.codeblock.Insert(1, new ArriveStmt(traveler.varName, value)); //create the traveller in the new timeline
             //TODO: add it so that the traveller can wait until something else to do somethings
-            newtimeline.RecalculateTimeIndexes(time.SavedTimeIndex+1, 1);
+            //newtimeline.RecalculateTimeIndexes(time.Value.SavedTimeIndex+1, 1);
 
             //Console.WriteLine("New Timeline:");
             //foreach (Statement v in newtimeline.rootContext.codeblock)
@@ -194,6 +192,26 @@ namespace emiT_C
             t.multiverse.ChangeTimeline(newtimeline);
             //t.Timelines +=
             //newtimeline.Run(); //start the new timeline
+            yield return null;
+        }
+    }
+
+    public class VarShiftExpr : Statement
+    {
+        public string varName;
+        public Operand op;
+        public Expression amount;
+
+        public VarShiftExpr(string varName, Operand op, Expression amount)
+        {
+            this.varName = varName;
+            this.op = op;
+            this.amount = amount;
+        }
+
+        public override IEnumerable Evaluate(Timeline t)
+        {
+            Evaluator.EvaluateVarShift(this, t);
             yield return null;
         }
     }
@@ -212,14 +230,12 @@ namespace emiT_C
 
         public override IEnumerable Evaluate(Timeline t)
         {
-
-            t.CreateVariable(traveler);
+            t.CreateAltVariable(traveler);
             if (value != null)
             {
                 t.SetVariable(traveler, value.Value);
                 yield return value.Value;
             }
-            yield return null;
         }
     }
 
@@ -326,6 +342,8 @@ namespace emiT_C
             return cond.ToString();
         }
     }
+
+
 
     public class UnaryExpr : Expression
     {

@@ -74,6 +74,16 @@ Array - stores an array of types, accessed with an integer within [] -> type[x]
 / - division
 % - modulus
 
+alpha :> 0 //move target to first alpha (original)
+alpha :> 1 //move target to second alpha created
+alpha ^> 1 //shifts target forward
+
+alpha :< 0 // move target to the last alpha created
+alpha :< 1 // move target to second to last alpha created
+alpha ^< 1 //shifts target back
+
+alpha //returns the alpha at the target
+
 --UNARY
 prefix
 - - flips sign of following value

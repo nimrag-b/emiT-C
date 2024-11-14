@@ -1,15 +1,19 @@
-//creates an infinite loop until stack overflow
+//creates an infinite loop until it reached 10000, then stops
+
+//a much more efficent and cleaner version of grandfather.emit
+//its actually quite incredible how much faster this runs
 
 create alpha = 0;
 
 time past;
-
 alpha = alpha + 1;
 print alpha;
 
-create beta;
-beta warps past{
-    alpha = alpha + 1;
-    beta kills beta;
-    time past;
+if(x >= 10000){
+    collapse;
+}
+
+//send alpha into the past, superceding itself as the active alpha
+alpha warps past{ 
+    time past; //this just brings the time point forward, so it is not interfering with past time travelers, and not running any of that now useless code
 }

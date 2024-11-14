@@ -20,7 +20,13 @@ namespace emiT_C
         Greater,
         Less,
         LessOrEqual,
-        GreaterOrEqual
+        GreaterOrEqual,
+
+        //VarShift
+        ShiftForward,
+        ShiftBack,
+        SetForward,
+        SetBack
     }
 
     public enum Type : byte

@@ -120,6 +120,30 @@ namespace emiT_C
                     }
                     break;
 
+                case ':':
+                    if (Match('>'))
+                    {
+                        AddToken(TokenType.SetTargetForward);
+                        break;
+                    }
+                    if (Match('<'))
+                    {
+                        AddToken(TokenType.SetTargetBack);
+                        break;
+                    }
+                    throw new Exception("Unexpected character at line " + line);
+                case '^':
+                    if (Match('>'))
+                    {
+                        AddToken(TokenType.ShiftTargetForward);
+                        break;
+                    }
+                    if (Match('<'))
+                    {
+                        AddToken(TokenType.ShiftTargetBack);
+                        break;
+                    }
+                    throw new Exception("Unexpected character at line " + line);
 
                 case ' ':
                 case '\r':

@@ -23,18 +23,22 @@ namespace emiT_C
             timelineStack.Push(prime);
             Timelines++;
             Timeline current;
+            int enumFrames = 0;
             while (timelineStack.Count > 0)
             {
                 current = timelineStack.Pop();
                 active = current;
                 while (active.Enumerator.MoveNext())
                 {
+                    enumFrames++;
                     if (Switching)
                     {
+
                         Switching = false;
                         break;
                     }
                 }
+
             }
 
             Console.WriteLine("Timelines Created: " + Timelines);

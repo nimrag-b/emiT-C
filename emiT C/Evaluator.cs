@@ -122,14 +122,41 @@ namespace emiT_C
             switch (stmt.property)
             {
                 case VarProperty.Dead:
-                    return new eValue(Type.Bool, !var.Alive);
+                    return new eValue(Type.Bool, !var.Value.Alive);
                 case VarProperty.Alive:
-                    return new eValue(Type.Bool, var.Alive);
+                    return new eValue(Type.Bool, var.Value.Alive);
                 case VarProperty.Exists:
                     return new eValue(Type.Bool, true);
             }
 
             throw new Exception("Unknown Property: "+ stmt.property);
+        }
+
+        public static void EvaluateVarShift(VarShiftExpr expr, Timeline t)
+        {
+            eVariable? var = t.GetActualVariable(expr.varName);
+            int amount = (int)expr.amount.Evaluate(t).value;
+            if (var == null)
+            {
+                throw new Exception();
+            }
+            switch (expr.op)
+            {
+                case Operand.ShiftForward:
+                    var.Value.SetPointer(var.Value.ValuePointer + amount);
+                    return;
+                case Operand.ShiftBack:
+                    var.Value.SetPointer(var.Value.ValuePointer - amount);
+                    return;
+                case Operand.SetForward:
+                    var.Value.SetPointer(amount);
+                    return;
+                case Operand.SetBack:
+                    var.Value.SetPointer(var.Value.Values.Count - 1 - amount);
+                    return;
+
+            }
+            throw new NotImplementedException();
         }
 
     }

@@ -18,6 +18,6 @@ traveler warps jump{
     out = x + y;
     x = y;
     y = out;
-    traveler kills traveler;
+    //traveler kills traveler;
+    //traveler :> 0;
 }
-

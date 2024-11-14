@@ -92,7 +92,6 @@ namespace emiT_C
 
             //for expressions that start with the variable
             ExprVariable lhs = ParseVariable();
-
             switch (At().type)
             {
                 case TokenType.Assign:
@@ -102,6 +101,12 @@ namespace emiT_C
                 case TokenType.Warps:
                     return ParseWarps(lhs);
             }
+            if (IsVarShiftOp(At().type))
+            {
+                return ParseVarShift(lhs);
+            }
+
+
 
             throw new Exception($"Unfinished Statement {lhs} at line {At().line}");
         }
@@ -248,6 +253,7 @@ namespace emiT_C
 
                     return new IndexExpr(symbol, index);
                 }
+
                 ExprVariable var = new ExprVariable(symbol);
 
                 return var;
@@ -296,6 +302,13 @@ namespace emiT_C
             Expression index = ParseBinaryExpr(0);
             Expect(TokenType.CloseSquare);
             return index;
+        }
+
+        public Statement ParseVarShift(ExprVariable varName)
+        {
+            Operand op = GetOperand(Eat().type);
+            Expression amount = ParseBinaryExpr(0);
+            return new VarShiftExpr(varName.varName,op,amount);
         }
 
         public Expression ParseBinaryExpr(int minPrec)
@@ -412,6 +425,15 @@ namespace emiT_C
                     return Operand.GreaterOrEqual;
                 case TokenType.LessOrEqual:
                     return Operand.LessOrEqual;
+
+                case TokenType.ShiftTargetBack:
+                    return Operand.ShiftBack;
+                case TokenType.ShiftTargetForward:
+                    return Operand.ShiftForward;
+                case TokenType.SetTargetForward:
+                    return Operand.SetForward;
+                case TokenType.SetTargetBack:
+                    return Operand.SetBack;
                 default:
                     throw new Exception("unrecognised operator:" + op);
             }
@@ -492,6 +514,21 @@ namespace emiT_C
                 case TokenType.LessOrEqual:
                 case TokenType.GreaterOrEqual:
                 case TokenType.NotEquals:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        public bool IsVarShiftOp(TokenType token)
+        {
+            switch (token)
+            {
+                case TokenType.ShiftTargetBack:
+                case TokenType.ShiftTargetForward:
+                case TokenType.SetTargetBack:
+                case TokenType.SetTargetForward:
                     return true;
 
                 default:

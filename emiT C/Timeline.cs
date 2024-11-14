@@ -37,6 +37,7 @@ namespace emiT_C
             this.depth = depth;
         }
 
+        //TODO: fix it so that it doesnt capture code from before the branch point - as it means the call list keeps having to be resized
         public Timeline Branch(eTime time)
         {
             return new Timeline(multiverse,time.variables, time.times, time.rootContext, time.SavedTimeIndex, depth+1);
@@ -48,7 +49,7 @@ namespace emiT_C
             {
                 if(ind.Value.SavedTimeIndex > point)
                 {
-                    times[ind.Key].SavedTimeIndex = ind.Value.SavedTimeIndex + length;
+                    //times[ind.Key].SavedTimeIndex = ind.Value.SavedTimeIndex + length;
                 }
             }
         }
@@ -57,9 +58,9 @@ namespace emiT_C
         {
             eTime time = new eTime(
                 variables.ToDictionary(entry => entry.Key, entry => (eVariable)entry.Value.Clone()),
-                times.ToDictionary(entry => entry.Key, entry => (eTime)entry.Value.Clone()), //doesnt need to be a deep copy since eTimes are essentially immutable
-                new CodeBlockStmt(rootContext.codeblock.ToList()), //can be even shallower copy
-                rootContext.CurTimeIndex
+                times.ToDictionary(entry => entry.Key, entry => entry.Value), //doesnt need to be a deep copy since eTimes are essentially immutable
+                new CodeBlockStmt(rootContext.codeblock.GetRange(rootContext.CurTimeIndex,rootContext.codeblock.Count-rootContext.CurTimeIndex)), //can be even shallower copy
+                0
                 );
             times[name] = time;
         }
@@ -70,16 +71,33 @@ namespace emiT_C
             return null;
         }
 
+        public void CreateAltVariable(string varName)
+        {
+            if (variables.ContainsKey(varName))
+            {
+                variables[varName].AddVariable(eValue.Null);
+                //CreateParadox($"{varName} met itself in the past, two of the same variables cannot exist at the same time.");
+            }
+            else
+            {
+                variables.Add(varName, new eVariable());
+            }
+
+            SwitchActiveVariable(varName, variables[varName].Values.Count - 1);
+        }
+
         public void CreateVariable(string varName)
         {
+            CreateAltVariable(varName);
+            return;
             if (variables.ContainsKey(varName))
             {
                 if (!variables[varName].Alive)
                 {
-                    variables[varName].Alive = true;
+                    variables[varName].SetAlive(true);
                     return;
                 }
-                CreateParadox($"{varName} met itself in the past, two of the same variables cannot exist at the same time.");
+                CreateParadox($"{varName} already defined.If you want to redefine, you must time travel.");
             }
             else
             {
@@ -114,7 +132,7 @@ namespace emiT_C
         {
             if (variables.ContainsKey(varName))
             {
-                variables[varName].Alive = false;
+                variables[varName].SetAlive(false);
             }
         }
 
@@ -124,7 +142,19 @@ namespace emiT_C
             {
                 if (variables[varName].Alive)
                 {
-                    variables[varName].value = value;
+                    variables[varName].SetVariable(value);
+                }
+
+            }
+        }
+
+        public void SwitchActiveVariable(string varName, int index)
+        {
+            if (variables.ContainsKey(varName))
+            {
+                if (variables[varName].Alive)
+                {
+                    variables[varName].SetPointer(index);
                 }
 
             }
