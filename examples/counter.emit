@@ -9,7 +9,7 @@ time past;
 alpha = alpha + 1;
 print alpha;
 
-if(x >= 10000){
+if(alpha >= 10000){
     collapse;
 }
 

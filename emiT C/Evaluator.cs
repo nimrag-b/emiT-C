@@ -14,6 +14,11 @@ namespace emiT_C
         {
             eValue left = binaryExpr.left.Evaluate(t);
 
+            if (left.value == null)
+            {
+                throw new Exception("Error: cannot operate Null value ");
+            }
+
             switch (left.type)
             {
                 case Type.Int:
@@ -48,6 +53,11 @@ namespace emiT_C
         {
             eValue right = unaryExpr.right.Evaluate(t);
 
+            if (right.value == null)
+            {
+                throw new Exception("Error: cannot operate Null value ");
+            }
+
             switch (right.type)
             {
                 case Type.Int:
@@ -74,6 +84,11 @@ namespace emiT_C
         public static eValue EvaluateBooleanExpr(BooleanExpr booleanExpr, Timeline t)
         {
             eValue left = booleanExpr.left.Evaluate(t);
+
+            if(left.value == null)
+            {
+                throw new Exception("Error: cannot compare Null value ");
+            }
 
             switch (left.type)
             {
