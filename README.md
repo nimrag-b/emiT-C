@@ -10,6 +10,8 @@ This is a small hobby project, most of which was written in one afternoon, so if
 
 Feel free to branch or edit any of the source, and if you end up making anything cool with it, id love to see :)
 
+join the discord! https://discord.gg/wVy3pXSsF2
+
 elsolang wiki link: https://esolangs.org/wiki/EmiT
 
 syntax highlighting can be found here: https://github.com/nimrag-b/emiT-syntax
