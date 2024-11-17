@@ -1,0 +1,80 @@
+//brainf*ck interpreter, using time travel
+
+
+create src = "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.";
+
+create p = int[2050]; //ptrs[0] == src index and ptrs[1] == memory pointer, the rest is all memory
+
+time start;
+
+create c = src[p[0]]; //current index
+if(c == '>'){
+    p[1] = p[1]+1;
+    p warps start p[0]=p[0]+1;
+}
+if(c == '<'){
+    p[1] = p[1]-1;
+    p warps start p[0]=p[0]+1;
+}
+if(c == '+'){
+    p[p[1]] = p[p[1]] + 1;
+    p warps start p[0]=p[0]+1;
+}
+if(c == '-'){
+    p[p[1]] = p[p[1]] - 1;
+    p warps start p[0]=p[0]+1;
+}
+if(c == '.'){
+    print p[p[1]];
+    p warps start p[0]=p[0]+1;
+}
+if(c == ','){ //no IO yet implemented
+    collapse;
+    p warps start p[0]=p[0]+1;
+}
+if(c == '['){
+
+    if(p[1] == 0){
+        p warps start p[0]=p[0]+1;
+    }
+    create tmp = int[2]; //tmp[0] is bracket count, tmp[1] is index offset
+    tmp[0] = 1;
+    time loop;
+    tmp[1] = tmp[1]+1; //increment offset
+    create o = p[0]+tmp[1];
+    if(o == ']'){
+        tmp[0] = tmp[0]-1;
+    }
+        if(o == '['){
+        tmp[0] = tmp[0]+1;
+    }
+
+    if(tmp[0] > 0){
+        tmp warps loop {};
+    }
+    p kills tmp;
+    p warps start p[0]=p[0]+1;
+}
+if(c == ']'){
+
+    if(p[1] == 0){
+        p warps start p[0]=p[0]+1;
+    }
+    create tmp = int[2]; //tmp[0] is bracket count, tmp[1] is index offset
+    tmp[0] = 1;
+    time loop;
+    tmp[1] = tmp[1]-1; //decrement offset
+    create o = p[0]+tmp[1];
+    if(o == '['){
+        tmp[0] = tmp[0]-1;
+    }
+    if(o == ']'){
+        tmp[0] = tmp[0]+1;
+    }
+
+    if(tmp[0] > 0){
+        tmp warps loop {};
+    }
+    p kills tmp;
+    p warps start p[0]=p[0]+1;
+}
